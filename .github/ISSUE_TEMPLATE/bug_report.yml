@@ -1,0 +1,14 @@
+name: Bug report
+description: Something looks or behaves wrong.
+labels: [bug]
+body:
+  - type: input
+    attributes: { label: Component or page, placeholder: "e.g. chain-of-thought, /icons/lucide/bell" }
+    validations: { required: true }
+  - type: textarea
+    attributes: { label: What happened, description: Include screenshots or a recording for visual issues. }
+    validations: { required: true }
+  - type: textarea
+    attributes: { label: What you expected }
+  - type: input
+    attributes: { label: Browser and OS, placeholder: "e.g. Chrome 140, macOS" }

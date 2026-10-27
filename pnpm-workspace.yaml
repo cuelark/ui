@@ -1,0 +1,14 @@
+# Standalone workspace root: this repository is not part of any parent pnpm workspace.
+packages:
+  - .
+
+onlyBuiltDependencies:
+  - esbuild
+  - workerd
+  - sharp
+
+# Only resolve package versions that have been public for at least 7 days (supply-chain hygiene).
+minimumReleaseAge: 10080
+
+# alchemy/wrangler declare optional peers newer than the pinned versions.
+strictPeerDependencies: false

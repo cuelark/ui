@@ -1,0 +1,10 @@
+// Local development only (`pnpm dev` via @cloudflare/vite-plugin). Deployed stages live in alchemy.run.ts.
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "cuelark-ui-local",
+  "main": "./src/worker.ts",
+  "compatibility_date": "2026-09-01",
+  "compatibility_flags": ["nodejs_compat"],
+  "observability": { "enabled": true },
+  "vars": { "STAGE": "local" }
+}

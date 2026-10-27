@@ -1,0 +1,12 @@
+#!/bin/sh
+# Every commit in this repository is authored and committed as Cuelark.
+# Maintainers only (contributors do not need this). Enable with: git config core.hooksPath .githooks
+expected="Cuelark <contact@cuelark.com>"
+for role in AUTHOR COMMITTER; do
+  ident=$(git var "GIT_${role}_IDENT" | sed 's/ [0-9]* [-+][0-9]*$//')
+  if [ "$ident" != "$expected" ]; then
+    echo "✗ commit ${role} is \"$ident\", expected \"$expected\"." >&2
+    echo "  Run: git config user.name Cuelark && git config user.email contact@cuelark.com" >&2
+    exit 1
+  fi
+done

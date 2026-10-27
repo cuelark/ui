@@ -1,0 +1,137 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "@fontsource-variable/geist-mono";
+/* Selectable sans faces (font-face rules only download when a face is actually used). */
+@import "@fontsource-variable/geist";
+@import "@fontsource-variable/inter-tight";
+@import "@fontsource-variable/ibm-plex-sans";
+@import "@fontsource-variable/dm-sans";
+@import "@fontsource-variable/manrope";
+@import "@fontsource-variable/plus-jakarta-sans";
+@import "@fontsource-variable/space-grotesk";
+@import "@fontsource-variable/instrument-sans";
+@import "@fontsource-variable/bricolage-grotesque";
+@import "./cuelark.css";
+
+@custom-variant dark (&:is(.dark *));
+
+@font-face {
+  font-family: "Inter Variable";
+  src: url("../fonts/inter/InterVariable.woff2") format("woff2");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* The standard shadcn/ui token mapping (what `shadcn init` writes); cuelark.css supplies the values. */
+@theme inline {
+  --font-sans: var(--cl-font-sans);
+  --font-mono: "Geist Mono Variable", ui-monospace, SFMono-Regular, monospace;
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+}
+
+:root {
+  --cl-font-sans: "Inter Variable", ui-sans-serif, system-ui, sans-serif;
+  --cl-text-size: 1;
+  --cl-tracking: 0em;
+}
+
+/* Text size scales the rem, so type, controls and spacing grow together and stay in proportion. */
+html {
+  font-size: calc(100% * var(--cl-text-size));
+}
+
+body {
+  letter-spacing: var(--cl-tracking);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  html {
+    scroll-padding-top: 5rem;
+    color-scheme: light;
+  }
+  html.dark {
+    color-scheme: dark;
+  }
+  body {
+    @apply bg-background font-sans text-foreground antialiased;
+    font-feature-settings: "cv11", "ss01";
+  }
+  ::selection {
+    @apply bg-signal/70 text-signal-foreground;
+  }
+}
+
+/* Shiki dual-theme output: each token carries both palettes as CSS variables. */
+.shiki,
+.shiki span {
+  color: var(--shiki-light);
+}
+.dark .shiki,
+.dark .shiki span {
+  color: var(--shiki-dark);
+}
+.shiki {
+  background: transparent !important;
+}
+
+/* A faint registration grid behind hero and preview areas. */
+@utility bg-grid {
+  background-image:
+    linear-gradient(to right, color-mix(in oklch, var(--border) 65%, transparent) 1px, transparent 1px),
+    linear-gradient(to bottom, color-mix(in oklch, var(--border) 65%, transparent) 1px, transparent 1px);
+  background-size: 28px 28px;
+}
+
+/* Docs prose for hand-written pages. */
+@utility prose-cue {
+  & h2 {
+    @apply mt-12 scroll-mt-24 text-xl font-semibold tracking-tight;
+  }
+  & h3 {
+    @apply mt-8 text-base font-semibold tracking-tight;
+  }
+  & p {
+    @apply mt-4 leading-7 text-muted-foreground;
+  }
+  & ul {
+    @apply mt-4 grid list-disc gap-2 ps-5 text-muted-foreground marker:text-border;
+  }
+  & ol {
+    @apply mt-4 grid list-decimal gap-2 ps-5 text-muted-foreground marker:font-mono marker:text-xs;
+  }
+  & a:not([data-slot]) {
+    @apply font-medium text-foreground underline decoration-border underline-offset-4 hover:decoration-primary;
+  }
+  & :not(pre) > code {
+    @apply rounded-sm border border-border bg-muted px-1 py-0.5 font-mono text-[0.8125em] text-foreground;
+  }
+  & strong {
+    @apply font-semibold text-foreground;
+  }
+}

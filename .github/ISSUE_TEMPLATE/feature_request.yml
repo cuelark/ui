@@ -1,0 +1,9 @@
+name: Component or feature request
+description: Suggest a component, effect, icon feature or improvement.
+labels: [enhancement]
+body:
+  - type: textarea
+    attributes: { label: What should it do, description: Links to references or examples help. }
+    validations: { required: true }
+  - type: textarea
+    attributes: { label: Why it is useful }
