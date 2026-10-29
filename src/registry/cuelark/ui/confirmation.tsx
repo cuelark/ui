@@ -17,14 +17,16 @@ type ConfirmationProps = Omit<React.ComponentProps<"div">, "title"> & {
   risk?: "low" | "high";
   onApprove?: () => void;
   onDeny?: () => void;
+  /** Start as a receipt, e.g. when rendering a past turn from history. */
+  defaultDecision?: "approved" | "denied";
 };
 
 /**
  * An agent asking permission before it acts (running a command, sending an email, spending money). The exact
  * action is shown verbatim; risky ones require press-and-hold; the decision then collapses to a one-line receipt.
  */
-function Confirmation({ title, description, command, risk = "low", onApprove, onDeny, className, ...props }: ConfirmationProps) {
-  const [decision, setDecision] = React.useState<"approved" | "denied" | null>(null);
+function Confirmation({ title, description, command, risk = "low", onApprove, onDeny, defaultDecision, className, ...props }: ConfirmationProps) {
+  const [decision, setDecision] = React.useState<"approved" | "denied" | null>(defaultDecision ?? null);
   const enter = React.useCallback((node: HTMLDivElement | null) => enterOnce(node, (s) => ({ opacity: 0, y: 8 * s, scale: 0.98 }), { duration: 0.35 }), []);
 
   if (decision) {

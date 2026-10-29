@@ -20,17 +20,19 @@ type PlanProps = Omit<React.ComponentProps<"div">, "title"> & {
   visible?: number;
   /** Bind ⌘/Ctrl+Enter to run and Esc to reject while the plan is pending. */
   shortcuts?: boolean;
+  /** Start already decided, e.g. when rendering a past turn from history. */
+  defaultState?: "pending" | "approved" | "rejected";
 };
 
 /**
  * A plan an agent wants to execute, held for your go-ahead. Crop marks lock onto it as it arrives; long plans fold
  * after a few steps; Run can count down to auto-approve (cancel by pressing it's ring). Resolved plans settle quietly.
  */
-function Plan({ title = "Plan", steps, onApprove, onReject, autoRun, visible = 4, shortcuts = true, className, ...props }: PlanProps) {
-  const [state, setState] = React.useState<"pending" | "approved" | "rejected">("pending");
+function Plan({ title = "Plan", steps, onApprove, onReject, autoRun, visible = 4, shortcuts = true, defaultState = "pending", className, ...props }: PlanProps) {
+  const [state, setState] = React.useState(defaultState);
   const [expanded, setExpanded] = React.useState(false);
   const [left, setLeft] = React.useState(autoRun ?? 0);
-  const [counting, setCounting] = React.useState(!!autoRun);
+  const [counting, setCounting] = React.useState(!!autoRun && defaultState === "pending");
   const ref = React.useRef<HTMLDivElement>(null);
 
   const approve = React.useCallback(() => {
