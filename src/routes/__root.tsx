@@ -30,7 +30,12 @@ export const Route = createRootRoute({
       { rel: "apple-touch-icon", href: "/apple-touch-icon.png" },
       { rel: "alternate", type: "text/plain", href: "/llms.txt", title: "llms.txt" },
     ],
-    scripts: [{ children: THEME_BOOT_SCRIPT }],
+    scripts: [
+      { children: THEME_BOOT_SCRIPT },
+      ...(import.meta.env.PROD
+        ? [{ src: "https://analytics.cuelark.com/js/script.js", defer: true, "data-website-id": "672g590k07053p5h" }]
+        : []),
+    ],
   }),
   component: Outlet,
   shellComponent: RootDocument,
