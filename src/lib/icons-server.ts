@@ -53,8 +53,8 @@ export const getIconPage = createServerFn({ method: "GET" })
     const names = index.names[meta.id]!;
     const slugs = index.slugs[meta.id]!;
     const related = names
-      .slice(Math.max(0, hit.at - 12), hit.at + 13)
-      .map((n, i) => ({ name: n, slug: slugs[Math.max(0, hit.at - 12) + i]!, data: set.icons[n]! }))
+      .slice(Math.max(0, hit.at - 8), hit.at + 9)
+      .map((n, i) => ({ name: n, slug: slugs[Math.max(0, hit.at - 8) + i]! }))
       .filter((r) => r.name !== hit.name);
     const words = iconWords(hit.name, meta.id);
     const alsoIn = words
@@ -74,10 +74,11 @@ export const getIconPage = createServerFn({ method: "GET" })
     const tier = (list: string[]) => (base.some((t) => list.includes(t)) ? 0 : aka.some((t) => list.includes(t)) ? 1 : second.some((t) => list.includes(t)) ? 2 : 9);
     const alike = names
       .map((n, i) => ({ n, i, t: tier(iconWords(n, meta.id).split(" ")) }))
-      .filter((x) => x.n !== hit.name && x.t < 9)
+      // Neighbours in the set are already shown below; prefer icons the visitor would not otherwise see.
+      .filter((x) => x.n !== hit.name && x.t < 9 && !related.some((r) => r.name === x.n))
       .sort((x, y) => x.t - y.t)
-      .slice(0, 24)
-      .map((x) => ({ name: x.n, slug: slugs[x.i]!, data: set.icons[x.n]! }));
+      .slice(0, 16)
+      .map((x) => ({ name: x.n, slug: slugs[x.i]! }));
     return { meta, setSlug: setSlug(meta.id), name: hit.name, slug: hit.slug, words, aka: relatedTerms(words, 8), icon: set.icons[hit.name]! as IconData, related, alsoIn, alike };
   });
 

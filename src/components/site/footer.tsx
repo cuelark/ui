@@ -4,6 +4,10 @@ import { components, SECTIONS } from "@/content/components";
 import type { Section } from "@/content/types";
 import { DOC_PAGES, SITE } from "@/content/site";
 import { Logo } from "./logo";
+import { cn } from "@/lib/utils";
+
+/** Link styling set once per list (it repeats on every page). */
+const LINKS = "[&_a]:inline-block [&_a]:py-1 [&_a]:text-muted-foreground [&_a]:transition-colors [&_a:hover]:text-foreground";
 
 /** Footer groups: every component is one link away from every page (internal linking for crawlers and people). */
 const GROUPS: { title: string; sections: Section[] }[] = [
@@ -29,6 +33,8 @@ const TOPICS: { label: string; to: string }[] = [
   { label: "Streaming text", to: "/components/streaming-text" },
   { label: "shadcn/ui components", to: "/components" },
   { label: "shadcn registry install", to: "/docs/installation" },
+  { label: "shadcn/ui themes", to: "/themes" },
+  { label: "Linear theme", to: "/themes/linear" },
   { label: "Tailwind CSS v4 themes", to: "/docs/theming" },
   { label: "Dark mode & presets", to: "/docs/theming" },
   { label: "Command palette", to: "/components/command" },
@@ -49,6 +55,8 @@ const TOPICS: { label: string; to: string }[] = [
 
 export function SiteFooter() {
   const home = useRouterState({ select: (s) => s.location.pathname === "/" });
+  // The 51k icon pages link to their set and similar icons instead; listing every component there only adds weight.
+  const iconPage = useRouterState({ select: (s) => /^\/icons\/[^/]+\/[^/]+$/.test(s.location.pathname) });
   return (
     <footer className="cue-dash-t mt-24">
       <div className="mx-auto grid max-w-7xl gap-12 px-4 py-14 sm:px-6">
@@ -72,7 +80,7 @@ export function SiteFooter() {
             </div>
           </div>
           <nav aria-label="Documentation and resources" className="grid grid-cols-2 gap-8 sm:grid-cols-3">
-            <FooterColumn title="Docs" links={[...DOC_PAGES.map((p) => ({ to: p.path, label: p.title })), { to: "/components", label: "All components" }, { to: "/agents", label: "Agent UI kit" }, { to: "/icons", label: "50,000+ icons" }]} />
+            <FooterColumn title="Docs" links={[...DOC_PAGES.map((p) => ({ to: p.path, label: p.title })), { to: "/components", label: "All components" }, { to: "/agents", label: "Agent UI kit" }, { to: "/themes", label: "Themes" }, { to: "/icons", label: "50,000+ icons" }]} />
             <div className="grid content-start gap-3">
               <h2 className="cue-label">Resources</h2>
               <ul className="grid gap-2 text-sm">
@@ -84,7 +92,7 @@ export function SiteFooter() {
                   { href: "/sitemap.xml", label: "Sitemap" },
                 ].map((l) => (
                   <li key={l.href}>
-                    <a href={l.href} className="text-muted-foreground transition-colors hover:text-foreground">
+                    <a href={l.href} className="inline-block py-1 text-muted-foreground transition-colors hover:text-foreground">
                       {l.label}
                     </a>
                   </li>
@@ -100,7 +108,7 @@ export function SiteFooter() {
           </nav>
         </div>
 
-        {!home && (
+        {!home && !iconPage && (
         <nav aria-label="All components" className="grid gap-8 border-t border-border pt-10 sm:grid-cols-2 lg:grid-cols-5">
           {GROUPS.map((g) => (
             <FooterColumn
@@ -115,10 +123,10 @@ export function SiteFooter() {
 
         <div className="grid gap-3 border-t border-border pt-8">
           <h2 className="cue-label">Topics</h2>
-          <ul className="flex flex-wrap gap-x-4 gap-y-1.5 text-xs">
+          <ul className={cn("flex flex-wrap gap-x-4 gap-y-1.5 text-xs [&_a]:underline-offset-4 [&_a:hover]:underline", LINKS)}>
             {TOPICS.map((t) => (
               <li key={t.label}>
-                <Link to={t.to} className="text-muted-foreground underline-offset-4 transition-colors hover:text-foreground hover:underline">
+                <Link to={t.to}>
                   {t.label}
                 </Link>
               </li>
@@ -146,10 +154,10 @@ function FooterColumn({ title, links, dense }: { title: string; links: { to: str
   return (
     <div className="grid content-start gap-3">
       <h2 className="cue-label">{title}</h2>
-      <ul className={dense ? "grid gap-1.5 text-[0.8125rem]" : "grid gap-2 text-sm"}>
+      <ul className={cn(dense ? "grid gap-1.5 text-[0.8125rem]" : "grid gap-2 text-sm", LINKS)}>
         {links.map((l) => (
           <li key={l.to}>
-            <Link to={l.to} className="text-muted-foreground transition-colors hover:text-foreground">
+            <Link to={l.to}>
               {l.label}
             </Link>
           </li>

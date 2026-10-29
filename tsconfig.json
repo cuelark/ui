@@ -18,6 +18,6 @@
     },
     "types": ["@cloudflare/workers-types", "node", "vite/client"]
   },
-  "include": ["src/**/*.ts", "src/**/*.tsx", "scripts/**/*.ts", "vite.config.ts", "alchemy.run.ts"],
+  "include": ["src/**/*.ts", "src/**/*.tsx", "scripts/**/*.ts", "vite.config.ts", "alchemy.run.ts", "alchemy.icons.ts"],
   "exclude": ["node_modules", "dist", ".alchemy", ".wrangler"]
 }

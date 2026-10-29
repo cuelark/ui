@@ -6,7 +6,7 @@ import { SITE } from "@/content/site";
 import { iconKeywords, iconSeoDescription, iconSeoTitle } from "@/lib/icon-seo";
 import { kebab } from "@/lib/icon-slugs";
 import { CodeBlock } from "@/components/site/code-block";
-import { getCode } from "@/lib/code";
+import { highlightLite } from "@/lib/highlight-lite";
 import { animatedIconComponentSource, formatMarkup, iconComponentSource, iconTitle, iconWords, svgMarkup } from "@/lib/icons";
 import { getIconPage } from "@/lib/icons-server";
 import { ld, seo } from "@/lib/seo";
@@ -20,10 +20,8 @@ export const Route = createFileRoute("/icons/$set/$icon")({
     if (!data) throw notFound();
     // Canonical, readable URL: /icons/lucide/arrow-right (old /icons/lu/LuArrowRight links redirect permanently).
     if (data.setSlug !== params.set || data.slug !== params.icon) throw redirect({ to: "/icons/$set/$icon", params: { set: data.setSlug, icon: data.slug }, statusCode: 301 });
-    // Highlight every snippet on the server so the formatted code is in the HTML (crawlable, no client highlighter).
-    const snippets = buildSnippets(data, animationFor(data.name));
-    const html = await getCode({ data: snippets.map((x) => ({ code: x.code, lang: x.lang })) });
-    return { ...data, snippets: snippets.map((x, i) => ({ ...x, html: html[i]!.html })) };
+    // Snippets are derived from the icon while rendering (see IconPage), so the page carries only the icon data.
+    return data;
   },
   head: ({ loaderData }) => {
     if (!loaderData) return {};
@@ -70,7 +68,11 @@ export const Route = createFileRoute("/icons/$set/$icon")({
 });
 
 type PageData = Awaited<ReturnType<typeof getIconPage>> & {};
-type Snip = { id: string; group: "static" | "animated" | "other"; label: string; code: string; lang: "tsx" | "bash"; html?: string };
+
+/** Icon tiles, styled once on the list rather than on each of ~50 items (icon pages ship as 51k static files). */
+const TILES =
+  "grid grid-cols-[repeat(auto-fill,minmax(7rem,1fr))] gap-2 [&_a]:grid [&_a]:justify-items-center [&_a]:gap-2 [&_a]:rounded-xl [&_a]:border [&_a]:border-transparent [&_a]:p-3 [&_a]:text-center [&_a:hover]:border-border [&_a:hover]:bg-card [&_a>span:first-child]:text-2xl [&_a>span:last-child]:w-full [&_a>span:last-child]:truncate [&_a>span:last-child]:text-[0.6875rem] [&_a>span:last-child]:text-muted-foreground";
+type Snip = { id: string; group: "static" | "animated" | "other"; label: string; code: string; lang: "tsx" | "bash" };
 
 /** Every copyable form of the icon. */
 function buildSnippets(d: PageData, animation: string): Snip[] {
@@ -102,17 +104,8 @@ function IconPage() {
   const [animation, setAnimation] = React.useState<string>(auto);
   // Still by default; plays on hover, on "Play", or when another animation is picked.
   const [play, setPlay] = React.useState(0);
-  // Re-highlight the animated snippets when another motion is picked (server-side Shiki, one small request).
-  const [snippets, setSnippets] = React.useState<Snip[]>(data.snippets);
-  React.useEffect(() => {
-    const next = buildSnippets(data, animation);
-    if (animation === auto) return setSnippets(data.snippets);
-    let live = true;
-    void getCode({ data: next.map((x) => ({ code: x.code, lang: x.lang })) }).then((html) => live && setSnippets(next.map((x, i) => ({ ...x, html: html[i]!.html }))));
-    return () => {
-      live = false;
-    };
-  }, [animation, auto, data]);
+  // Every copyable form, rebuilt and highlighted locally (same output on server and client) when the motion changes.
+  const snippets = React.useMemo(() => buildSnippets(data, animation).map((x) => ({ ...x, html: highlightLite(x.code, x.lang) })), [data, animation]);
   const group = (g: Snip["group"]) => snippets.filter((x) => x.group === g);
   return (
     <main id="main" className="mx-auto grid max-w-6xl gap-10 px-4 py-10 sm:px-6">
@@ -130,7 +123,6 @@ function IconPage() {
       <div className="grid gap-8 lg:grid-cols-[1fr_1.2fr]">
         <div className="grid content-start gap-4">
           <div className="relative grid aspect-square place-items-center overflow-hidden rounded-3xl border border-border bg-card text-[7rem]">
-            <div aria-hidden="true" className="bg-grid pointer-events-none absolute inset-0 opacity-50" />
             <button type="button" onClick={() => setPlay((p) => p + 1)} className="absolute end-3 bottom-3 inline-flex h-8 items-center gap-1.5 rounded-full border border-border bg-background/90 px-3 text-xs font-medium shadow-control backdrop-blur hover:bg-muted">
               ▶ Play {animation}
             </button>
@@ -220,12 +212,12 @@ function IconPage() {
           <h2 id="alike" className="font-semibold tracking-tight">
             Related icons: {aka.slice(0, 4).join(", ")}
           </h2>
-          <ul className="grid grid-cols-[repeat(auto-fill,minmax(7rem,1fr))] gap-2">
+          <ul className={TILES}>
             {alike.map((r) => (
               <li key={r.name}>
-                <Link to="/icons/$set/$icon" params={{ set: setSlug, icon: r.slug }} className="grid justify-items-center gap-2 rounded-xl border border-transparent p-3 text-center hover:border-border hover:bg-card">
-                  <span className="text-2xl" dangerouslySetInnerHTML={{ __html: svgMarkup(r.data) }} />
-                  <span className="w-full truncate text-[0.6875rem] text-muted-foreground">{iconWords(r.name, meta.id) || r.name}</span>
+                <Link to="/icons/$set/$icon" params={{ set: setSlug, icon: r.slug }}>
+                  <span className="icon-mask" style={{ "--icon": `url(/icons/${setSlug}/${r.slug}.svg)` } as React.CSSProperties} />
+                  <span>{iconWords(r.name, meta.id) || r.name}</span>
                 </Link>
               </li>
             ))}
@@ -237,14 +229,10 @@ function IconPage() {
           <h2 id="also-in" className="font-semibold tracking-tight">
             {t} icon in other sets
           </h2>
-          <ul className="flex flex-wrap gap-2">
+          <ul className="flex flex-wrap gap-2 [&_a]:inline-flex [&_a]:h-8 [&_a]:items-center [&_a]:gap-2 [&_a]:rounded-full [&_a]:border [&_a]:border-border [&_a]:bg-card [&_a]:px-3 [&_a]:text-sm [&_a]:shadow-control [&_a]:transition-colors [&_a:hover]:bg-muted">
             {alsoIn.map((a) => (
               <li key={a.setSlug}>
-                <Link
-                  to="/icons/$set/$icon"
-                  params={{ set: a.setSlug, icon: a.slug }}
-                  className="inline-flex h-8 items-center gap-2 rounded-full border border-border bg-card px-3 text-sm shadow-control transition-colors hover:bg-muted"
-                >
+                <Link to="/icons/$set/$icon" params={{ set: a.setSlug, icon: a.slug }}>
                   {t} <span className="text-muted-foreground">· {a.setName}</span>
                 </Link>
               </li>
@@ -256,12 +244,12 @@ function IconPage() {
         <h2 id="related" className="font-semibold tracking-tight">
           Similar {meta.name} icons
         </h2>
-        <ul className="grid grid-cols-[repeat(auto-fill,minmax(7rem,1fr))] gap-2">
+        <ul className={TILES}>
           {related.map((r) => (
             <li key={r.name}>
-              <Link to="/icons/$set/$icon" params={{ set: setSlug, icon: r.slug }} className="grid justify-items-center gap-2 rounded-xl border border-transparent p-3 text-center hover:border-border hover:bg-card">
-                <span className="text-2xl" dangerouslySetInnerHTML={{ __html: svgMarkup(r.data) }} />
-                <span className="w-full truncate text-[0.6875rem] text-muted-foreground">{iconWords(r.name, meta.id) || r.name}</span>
+              <Link to="/icons/$set/$icon" params={{ set: setSlug, icon: r.slug }}>
+                <span className="icon-mask" style={{ "--icon": `url(/icons/${setSlug}/${r.slug}.svg)` } as React.CSSProperties} />
+                <span>{iconWords(r.name, meta.id) || r.name}</span>
               </Link>
             </li>
           ))}

@@ -45,6 +45,7 @@
     "plan:preview": "tsx scripts/deploy.ts preview --plan",
     "deploy:preview": "tsx scripts/deploy.ts preview",
     "deploy:prod": "tsx scripts/deploy.ts prod",
+    "deploy:icons": "tsx scripts/deploy-icons.ts",
     "icons:build": "tsx scripts/icons.ts"
   },
   "dependencies": {

@@ -8,8 +8,14 @@ type Ctx = { waitUntil(p: Promise<unknown>): void };
 
 export default {
   async fetch(request, env, ctx) {
-    const render = () => (serverEntry.fetch as (r: Request, ...rest: unknown[]) => Promise<Response>)(request, env, ctx);
     const url = new URL(request.url);
+    // /icons/<set>/<icon>.svg are static files in production (the icon shards); elsewhere answer them from the registry route.
+    const svg = /^\/icons\/([a-z0-9-]+)\/([a-z0-9-]+)\.svg$/.exec(url.pathname);
+    if (svg) {
+      url.pathname = `/r/icons/${svg[1]}/${svg[2]}.svg`;
+      request = new Request(url, request) as typeof request;
+    }
+    const render = () => (serverEntry.fetch as (r: Request, ...rest: unknown[]) => Promise<Response>)(request, env, ctx);
     if (request.method !== "GET" || url.search || !EDGE_CACHED.test(url.pathname)) return render();
 
     // Render once per edge location, then serve it like a static file until the next deploy purges or it expires.
