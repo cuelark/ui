@@ -27,7 +27,9 @@ export const Route = createFileRoute("/icons/search/$query")({
       description: `Find ${total.toLocaleString()} free ${q} icons${relatedTerms(q, 3).length ? ` (also ${relatedTerms(q, 3).join(", ")} icons)` : ""} from Lucide, Heroicons, Font Awesome, Material Design, Phosphor, Tabler and more. Download SVGs or copy static and animated React components, installable with the shadcn CLI.`,
       // Filtered (?set=) and paged variants all canonicalize to the main results page.
       path,
-      noindex: total === 0,
+      // Only the prerendered popular searches are indexed; any other term is rendered on request (and robots.txt
+      // keeps crawlers off it), so it stays out of the index too.
+      noindex: total === 0 || !POPULAR_SEARCHES.includes(kebab(q) || params.query),
       keywords: [...relatedTerms(q, 6).map((t) => `${t} icon`), `${q} icon`, `${q} icons`, `${q} icon svg`, `${q} icon react`, `free ${q} icons`, `${q} icon png svg`, `animated ${q} icon`, `${q} icon tailwind`, `${q} icon shadcn`, `${q} vector icon`],
       jsonLd: [
         ld.breadcrumbs([

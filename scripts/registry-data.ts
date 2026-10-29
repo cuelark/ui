@@ -149,6 +149,26 @@ export function buildSitemaps(lastmod: string): Record<string, string> {
   return files;
 }
 
+/**
+ * robots.txt: everything is open to crawlers (search engines and AI assistants alike) except endpoints that run code
+ * per request and have no page worth indexing: arbitrary icon searches (the popular ones are prerendered and allowed),
+ * per-icon registry files, server functions and standalone previews. Keeps crawlers off the Worker request budget.
+ */
+export function buildRobots() {
+  return [
+    "User-agent: *",
+    "Allow: /",
+    ...POPULAR_SEARCHES.map((t) => `Allow: /icons/search/${t}$`),
+    "Disallow: /icons/search/",
+    "Disallow: /r/icons/",
+    "Disallow: /_serverFn/",
+    "Disallow: /preview/",
+    "",
+    `Sitemap: ${SITE.url}/sitemap.xml`,
+    "",
+  ].join("\n");
+}
+
 export function buildLlms() {
   const docs = DOC_PAGES.map((p) => `- [${p.title}](${SITE.url}${p.path}): ${p.description}`).join("\n");
   const items = components.map((c) => `- [${c.name}](${SITE.url}/components/${c.slug}): ${c.description} Registry item: ${registryUrl(c.slug)}`).join("\n");

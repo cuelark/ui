@@ -8,7 +8,7 @@
  */
 import { writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { ROOT, buildLlms, buildLlmsFull, buildRegistry, buildSitemaps, buildThemeCss } from "./registry-data.ts";
+import { ROOT, buildLlms, buildLlmsFull, buildRegistry, buildRobots, buildSitemaps, buildThemeCss } from "./registry-data.ts";
 
 const files: Record<string, string> = {
   "registry.json": `${JSON.stringify(buildRegistry(), null, 2)}\n`,
@@ -16,6 +16,7 @@ const files: Record<string, string> = {
   ...buildSitemaps(new Date().toISOString().slice(0, 10)),
   "public/llms.txt": buildLlms(),
   "public/llms-full.txt": buildLlmsFull(),
+  "public/robots.txt": buildRobots(),
 };
 
 for (const [path, content] of Object.entries(files)) writeFileSync(join(ROOT, path), content);
