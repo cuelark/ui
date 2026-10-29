@@ -33,11 +33,11 @@ export function Search() {
         type="button"
         onClick={() => setOpen(true)}
         aria-label="Search documentation"
-        className="flex h-ctl-sm w-full items-center gap-2 rounded-lg border border-border bg-muted/60 ps-2.5 pe-1 text-sm text-muted-foreground outline-none transition-colors hover:bg-muted hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/50 sm:w-60"
+        className="flex size-ctl-sm items-center justify-center gap-2 rounded-lg border border-border bg-muted/60 text-sm text-muted-foreground outline-none transition-colors hover:bg-muted hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/50 sm:w-60 sm:justify-start sm:ps-2.5 sm:pe-1"
       >
         <SearchIcon className="size-3.5 shrink-0" />
-        <span className="flex-1 truncate text-left">Search components…</span>
-        <kbd className="cue-kbd">⌘K</kbd>
+        <span className="flex-1 truncate text-left max-sm:sr-only">Search components…</span>
+        <kbd className="cue-kbd max-sm:hidden">⌘K</kbd>
       </button>
       <CommandDialog open={open} onOpenChange={setOpen} title="Search Cuelark UI" description="Jump to a component or docs page.">
         <CommandInput placeholder={`Search ${components.length} components and docs…`} />

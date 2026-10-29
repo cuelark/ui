@@ -19,8 +19,9 @@ type DockProps = React.ComponentProps<"nav"> & {
 };
 
 /**
- * A macOS-style dock: items swell as the pointer nears them and neighbours make room, eased with GSAP
- * GSAP. Keyboard focus lifts an item the same way; with motion off it is a plain toolbar.
+ * A macOS-style dock: items swell as the pointer nears them and neighbours make room, eased with GSAP.
+ * Keyboard focus lifts an item the same way; with motion off it is a plain toolbar. On narrow screens the items
+ * shrink (staying square) so the dock always fits its container.
  */
 function Dock({ className, size = 40, magnification = 1.6, distance = 120, children, ...props }: DockProps) {
   const ref = React.useRef<HTMLElement>(null);
@@ -37,7 +38,7 @@ function Dock({ className, size = 40, magnification = 1.6, distance = 120, child
         const t = Math.max(0, 1 - d / distance);
         target = size + size * (magnification - 1) * Math.cos(((1 - t) * Math.PI) / 2) ** 2 * Math.min(scale, 1.5);
       }
-      gsap.to(item, { width: target, height: target, duration: 0.3, ease: "cue", overwrite: "auto" });
+      gsap.to(item, { width: target, duration: 0.3, ease: "cue", overwrite: "auto" });
     });
   };
 
@@ -46,7 +47,7 @@ function Dock({ className, size = 40, magnification = 1.6, distance = 120, child
       <nav
         ref={ref}
         data-slot="dock"
-        className={cn("mx-auto flex w-fit items-end gap-2 rounded-2xl border border-border bg-card/80 p-2 shadow-raised backdrop-blur-md", className)}
+        className={cn("mx-auto flex w-fit max-w-full items-end gap-1.5 rounded-2xl border border-border bg-card/80 p-2 shadow-raised backdrop-blur-md sm:gap-2", className)}
         style={{ height: size + 16 }}
         onPointerMove={(e) => update(e.clientX)}
         onPointerLeave={() => update(null)}
@@ -75,17 +76,17 @@ function DockItem({ className, label, active, asChild, children, onFocus, onBlur
       data-active={active || undefined}
       aria-label={label}
       className={cn(
-        "group/dock relative flex shrink-0 items-center justify-center rounded-xl border border-border bg-background text-foreground shadow-control outline-none focus-visible:ring-3 focus-visible:ring-ring/50 [&_svg]:pointer-events-none [&_svg]:size-[45%]",
+        "group/dock relative flex aspect-square min-w-0 shrink items-center justify-center rounded-xl border border-border bg-background text-foreground shadow-control outline-none focus-visible:ring-3 focus-visible:ring-ring/50 [&_svg]:pointer-events-none [&_svg]:size-[45%]",
         className,
       )}
-      style={{ width: size, height: size }}
+      style={{ width: size }}
       onFocus={(e: React.FocusEvent<HTMLButtonElement>) => {
         onFocus?.(e);
-        if (motionScale(e.currentTarget)) gsap.to(e.currentTarget, { width: size * Math.min(magnification, 1.3), height: size * Math.min(magnification, 1.3), duration: 0.3, ease: "cue" });
+        if (motionScale(e.currentTarget)) gsap.to(e.currentTarget, { width: size * Math.min(magnification, 1.3), duration: 0.3, ease: "cue" });
       }}
       onBlur={(e: React.FocusEvent<HTMLButtonElement>) => {
         onBlur?.(e);
-        gsap.to(e.currentTarget, { width: size, height: size, duration: 0.3, ease: "cue" });
+        gsap.to(e.currentTarget, { width: size, duration: 0.3, ease: "cue" });
       }}
       {...props}
     >

@@ -22,7 +22,7 @@ function BreadcrumbLink({ asChild, className, ...props }: React.ComponentProps<"
   return (
     <Comp
       data-slot="breadcrumb-link"
-      className={cn("rounded-sm underline-offset-4 outline-none transition-colors hover:text-foreground hover:underline focus-visible:ring-3 focus-visible:ring-ring/50", className)}
+      className={cn("-my-1 inline-block rounded-sm py-1 underline-offset-4 outline-none transition-colors hover:text-foreground hover:underline focus-visible:ring-3 focus-visible:ring-ring/50", className)}
       {...props}
     />
   );

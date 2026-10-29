@@ -65,7 +65,7 @@ function Queue({ items, onItemsChange, label = "Queued", className, ...props }: 
             <GripVerticalIcon className="size-3.5 shrink-0 text-muted-foreground/60" />
             <span className="font-mono text-[0.6875rem] text-muted-foreground">{i + 1}</span>
             <span className="flex-1 truncate">{it.text}</span>
-            <button type="button" aria-label={`Remove “${it.text}”`} onClick={() => onItemsChange?.(items.filter((x) => x.id !== it.id))} className="grid size-5 place-items-center rounded text-muted-foreground opacity-0 group-hover/q:opacity-100 group-focus-within/q:opacity-100 hover:bg-muted hover:text-foreground">
+            <button type="button" aria-label={`Remove “${it.text}”`} onClick={() => onItemsChange?.(items.filter((x) => x.id !== it.id))} className="relative after:absolute after:-inset-2 grid size-5 place-items-center rounded text-muted-foreground opacity-0 group-hover/q:opacity-100 group-focus-within/q:opacity-100 hover:bg-muted hover:text-foreground pointer-coarse:opacity-100">
               <XIcon className="size-3" />
             </button>
           </li>

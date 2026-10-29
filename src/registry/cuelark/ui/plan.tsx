@@ -146,7 +146,7 @@ function CountdownRing({ left, total, onCancel }: { left: number; total: number;
         onCancel();
       }}
       onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && (e.stopPropagation(), e.preventDefault(), onCancel())}
-      className="-ms-1 grid size-4 place-items-center rounded-full"
+      className="relative after:absolute after:-inset-2 -ms-1 grid size-4 place-items-center rounded-full"
     >
       <svg viewBox="0 0 16 16" className="size-4 -rotate-90" aria-hidden="true">
         <circle cx="8" cy="8" r={r} fill="none" stroke="currentColor" strokeOpacity="0.25" strokeWidth="2" />

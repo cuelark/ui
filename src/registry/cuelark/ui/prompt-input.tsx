@@ -79,7 +79,7 @@ function PromptInput({ onSubmit, status = "idle", onStop, placeholder = "Ask any
             <li key={`${f.name}-${i}`} className="inline-flex h-7 max-w-48 items-center gap-1.5 rounded-lg border border-border bg-muted/60 ps-2 pe-1 text-xs">
               <PaperclipIcon className="size-3 shrink-0 text-muted-foreground" />
               <span className="truncate">{f.name}</span>
-              <button type="button" aria-label={`Remove ${f.name}`} onClick={() => setFiles((all) => all.filter((_, j) => j !== i))} className="grid size-5 place-items-center rounded-md text-muted-foreground hover:bg-foreground/10 hover:text-foreground">
+              <button type="button" aria-label={`Remove ${f.name}`} onClick={() => setFiles((all) => all.filter((_, j) => j !== i))} className="relative after:absolute after:-inset-2 grid size-5 place-items-center rounded-md text-muted-foreground hover:bg-foreground/10 hover:text-foreground">
                 <XIcon className="size-3" />
               </button>
             </li>

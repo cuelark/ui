@@ -53,7 +53,7 @@ function Stepper({ className, steps, current, orientation = "horizontal", onStep
             data-step={i}
             data-state={state}
             aria-current={state === "current" ? "step" : undefined}
-            className={cn("group/step relative flex", vertical ? "gap-3 pb-6 last:pb-0" : "flex-1 flex-col gap-2 last:flex-none")}
+            className={cn("group/step relative flex min-w-0", vertical ? "gap-3 pb-6 last:pb-0" : "flex-1 flex-col gap-2 last:flex-none")}
           >
             <div className={cn("flex items-center", vertical ? "flex-col self-stretch" : "w-full")}>
               <Marker
@@ -79,7 +79,7 @@ function Stepper({ className, steps, current, orientation = "horizontal", onStep
                 </span>
               )}
             </div>
-            <div className={cn("grid gap-0.5", vertical ? "pt-1" : "pe-4")}>
+            <div className={cn("grid gap-0.5", vertical ? "pt-1" : "pe-2 sm:pe-4", !vertical && state !== "current" && "max-sm:sr-only")}>
               <span className={cn("text-sm font-medium", state === "upcoming" && "text-muted-foreground")}>{step.title}</span>
               {step.description && <span className="text-xs text-muted-foreground">{step.description}</span>}
             </div>

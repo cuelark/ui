@@ -92,7 +92,7 @@ function TraceWaterfall({ spans, now: nowProp, className, ...props }: TraceWater
             <div key={span.id} role="treeitem" aria-expanded={hasKids ? open.has(span.id) : undefined} className="grid grid-cols-[minmax(9rem,14rem)_1fr] items-center border-b border-border/60 last:border-b-0 hover:bg-muted/40">
               <div className="flex min-w-0 items-center gap-1.5 py-1.5 pe-2" style={{ paddingInlineStart: 8 + depth * 16 }}>
                 {hasKids ? (
-                  <button type="button" onClick={() => toggle(span.id)} aria-label={open.has(span.id) ? "Collapse" : "Expand"} className="grid size-4 place-items-center rounded text-muted-foreground hover:text-foreground">
+                  <button type="button" onClick={() => toggle(span.id)} aria-label={open.has(span.id) ? "Collapse" : "Expand"} className="relative after:absolute after:-inset-2 grid size-4 place-items-center rounded text-muted-foreground hover:text-foreground">
                     <ChevronRightIcon className={cn("size-3.5 transition-transform duration-200 ease-cue", open.has(span.id) && "rotate-90")} />
                   </button>
                 ) : (

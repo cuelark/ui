@@ -13,10 +13,10 @@ function Tabs({ className, ...props }: React.ComponentProps<typeof TabsPrimitive
   return <TabsPrimitive.Root data-slot="tabs" className={cn("flex flex-col gap-3 data-[orientation=vertical]:flex-row", className)} {...props} />;
 }
 
-const listVariants = cva("relative inline-flex w-fit items-center text-muted-foreground", {
+const listVariants = cva("relative inline-flex w-fit max-w-full items-center text-muted-foreground", {
   variants: {
     variant: {
-      segmented: "h-ctl-md rounded-lg bg-muted p-[3px] shadow-well data-[orientation=vertical]:h-auto data-[orientation=vertical]:flex-col data-[orientation=vertical]:items-stretch",
+      segmented: "h-ctl-md overflow-x-auto rounded-lg bg-muted p-[3px] shadow-well [scrollbar-width:none] data-[orientation=vertical]:h-auto data-[orientation=vertical]:flex-col data-[orientation=vertical]:items-stretch",
       underline:
         "h-ctl-md gap-5 border-b border-border data-[orientation=vertical]:h-auto data-[orientation=vertical]:flex-col data-[orientation=vertical]:items-start data-[orientation=vertical]:gap-1 data-[orientation=vertical]:border-s data-[orientation=vertical]:border-b-0 data-[orientation=vertical]:ps-3",
     },

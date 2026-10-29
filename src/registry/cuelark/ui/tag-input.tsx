@@ -77,7 +77,7 @@ function TagInput({ value, defaultValue = [], onValueChange, suggestions = [], m
               type="button"
               aria-label={`Remove ${t}`}
               onClick={() => commit(tags.filter((x) => x !== t))}
-              className="grid size-4 place-items-center rounded-sm text-muted-foreground outline-none hover:bg-foreground/10 hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring/50"
+              className="relative after:absolute after:-inset-2 grid size-4 place-items-center rounded-sm text-muted-foreground outline-none hover:bg-foreground/10 hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring/50"
             >
               <XIcon className="size-3" />
             </button>

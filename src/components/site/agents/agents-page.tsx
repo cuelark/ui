@@ -102,7 +102,7 @@ function InstallLine() {
     <div className="flex max-w-full items-center gap-1 rounded-xl border border-border bg-card py-1 ps-3 pe-1 font-mono text-xs shadow-raised">
       <span className="text-muted-foreground select-none">$</span>
       <span className="truncate">{cmd}</span>
-      <CopyButton value={cmd} label="Copy install command" />
+      <CopyButton value={cmd} className="shrink-0" />
     </div>
   );
 }

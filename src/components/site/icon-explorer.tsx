@@ -80,9 +80,9 @@ export function IconExplorer({ initialSet }: { initialSet?: string }) {
                 ))}
               </select>
             </label>
-            <div className="flex min-w-0 flex-1 items-center gap-2">
+            <div className="flex min-w-0 flex-1 basis-full items-center gap-2 sm:basis-auto">
               <span className="shrink-0 text-sm text-muted-foreground">Hover</span>
-              <div role="radiogroup" aria-label="Hover animation" className="flex gap-1 overflow-x-auto [scrollbar-width:none]">
+              <div role="radiogroup" aria-label="Hover animation" className="flex min-w-0 gap-1 overflow-x-auto [scrollbar-width:none]">
                 {(["off", ...ANIMATIONS] as const).map((a) => (
                   <button
                     key={a}

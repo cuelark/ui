@@ -19,7 +19,7 @@ function Checkpoint({ label = "Checkpoint", time, onRestore, className, ...props
         <span className="font-medium text-foreground">{label}</span>
         {time && <span className="font-mono">{time}</span>}
         {onRestore && (
-          <button type="button" onClick={onRestore} className="ms-1 inline-flex h-5 items-center gap-1 rounded-full px-2 font-medium text-foreground outline-none hover:bg-muted focus-visible:ring-3 focus-visible:ring-ring/50">
+          <button type="button" onClick={onRestore} className="relative ms-1 inline-flex h-5 items-center gap-1 rounded-full px-2 after:absolute after:-inset-y-2 after:inset-x-0 font-medium text-foreground outline-none hover:bg-muted focus-visible:ring-3 focus-visible:ring-ring/50">
             <RotateCcwIcon className="size-3" /> Restore
           </button>
         )}

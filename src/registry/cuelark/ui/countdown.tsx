@@ -47,19 +47,19 @@ function Countdown({ to, units = ["days", "hours", "minutes", "seconds"], onComp
   }, [now, target, onComplete]);
 
   return (
-    <div ref={ref} data-slot="countdown" role="timer" className={cn("inline-flex items-start gap-2", className)} {...props}>
+    <div ref={ref} data-slot="countdown" role="timer" className={cn("inline-flex items-start gap-1 sm:gap-2", className)} {...props}>
       <time dateTime={new Date(target).toISOString()} className="sr-only" suppressHydrationWarning>
         {parts.map((p) => `${Number(p.value)} ${p.unit}`).join(", ")} remaining
       </time>
       {parts.map((p, i) => (
         <React.Fragment key={p.unit}>
           {i > 0 && (
-            <span aria-hidden="true" className="pt-3 font-mono text-xl text-muted-foreground">
+            <span aria-hidden="true" className="pt-[clamp(0.375rem,2.4vw,0.75rem)] font-mono text-base text-muted-foreground sm:pt-3 sm:text-xl">
               :
             </span>
           )}
           <div aria-hidden="true" className="grid justify-items-center gap-1.5">
-            <div className="flex gap-1">
+            <div className="flex gap-0.5 sm:gap-1">
               {[...p.value].map((d, j) => (
                 <Digit key={j} value={d} />
               ))}
@@ -82,7 +82,7 @@ function Digit({ value }: { value: string }) {
     if (motionScale(el)) gsap.fromTo(el, { yPercent: -60, opacity: 0, filter: "blur(2px)" }, { yPercent: 0, opacity: 1, filter: "blur(0px)", duration: 0.35, ease: "cue" });
   }, [value]);
   return (
-    <span className="relative grid h-14 w-10 place-items-center overflow-hidden rounded-lg border border-border bg-card font-mono text-3xl font-semibold tabular-nums shadow-raised after:absolute after:inset-x-0 after:top-1/2 after:h-px after:bg-border/70">
+    <span className="relative grid h-[clamp(2.25rem,12vw,3.5rem)] w-[clamp(1.375rem,7.2vw,2.5rem)] place-items-center overflow-hidden rounded-md border border-border bg-card font-mono text-[clamp(1.125rem,6vw,1.875rem)] sm:h-14 sm:w-10 sm:rounded-lg sm:text-3xl font-semibold tabular-nums shadow-raised after:absolute after:inset-x-0 after:top-1/2 after:h-px after:bg-border/70">
       <span ref={ref} suppressHydrationWarning>
         {value}
       </span>
