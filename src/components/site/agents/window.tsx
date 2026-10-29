@@ -1,5 +1,5 @@
 import * as React from "react";
-import { PlayIcon, RotateCcwIcon } from "lucide-react";
+import { Maximize2Icon, Minimize2Icon, PlayIcon, RotateCcwIcon } from "lucide-react";
 
 import { Button } from "@/registry/cuelark/ui/button";
 import { Conversation, ConversationContent } from "@/registry/cuelark/ui/conversation";
@@ -22,9 +22,31 @@ type AgentWindowProps = {
  * files) on the right. Tall enough to feel like a real product, never taller than the screen.
  */
 export function AgentWindow({ name, context, script, thread, composer, panel, className }: AgentWindowProps) {
+  // Full screen expands this same element in place, so a run keeps playing while you toggle it.
+  const [full, setFull] = React.useState(false);
+  React.useEffect(() => {
+    if (!full) return;
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setFull(false);
+    const overflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    window.addEventListener("keydown", onKey);
+    return () => {
+      document.body.style.overflow = overflow;
+      window.removeEventListener("keydown", onKey);
+    };
+  }, [full]);
   return (
-    <div className={cn("grid overflow-hidden rounded-2xl border border-border bg-background shadow-raised lg:h-[min(50rem,calc(100dvh-8rem))] lg:min-h-[38rem] lg:grid-cols-[minmax(0,1fr)_minmax(20rem,27rem)]", className)}>
-      <div className="flex h-[44rem] min-w-0 flex-col lg:h-auto lg:min-h-0">
+    <div
+      role={full ? "dialog" : undefined}
+      aria-modal={full || undefined}
+      aria-label={full ? `${name} demo, full screen` : undefined}
+      className={cn(
+        "grid overflow-hidden border border-border bg-background lg:grid-cols-[minmax(0,1fr)_minmax(20rem,27rem)]",
+        full ? "fixed inset-0 z-[100] h-dvh grid-rows-[minmax(0,1fr)_auto] overflow-y-auto lg:grid-rows-1" : "rounded-2xl shadow-raised lg:h-[min(50rem,calc(100dvh-8rem))] lg:min-h-[38rem]",
+        className,
+      )}
+    >
+      <div className={cn("flex min-w-0 flex-col lg:h-auto lg:min-h-0", full ? "h-dvh" : "h-[44rem]")}>
         <div className="flex items-center gap-2 border-b border-border px-4 py-2.5">
           <span className={cn("size-2 rounded-full bg-signal", script.playing && "animate-pulse")} />
           <span className="text-sm font-medium">{name}</span>
@@ -32,6 +54,9 @@ export function AgentWindow({ name, context, script, thread, composer, panel, cl
           <Button variant={script.playing ? "ghost" : "secondary"} size="xs" className="ms-auto" onClick={script.play}>
             {script.playing ? <RotateCcwIcon /> : <PlayIcon />}
             {script.playing ? "Restart" : "Play the run"}
+          </Button>
+          <Button variant="ghost" size="icon-sm" onClick={() => setFull((f) => !f)} aria-label={full ? "Exit full screen" : "Full screen"} title={full ? "Exit full screen (Esc)" : "Full screen"}>
+            {full ? <Minimize2Icon /> : <Maximize2Icon />}
           </Button>
         </div>
         <Conversation className="min-h-0 flex-1">

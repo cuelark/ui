@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { HeadContent, Link, Outlet, Scripts, createRootRoute } from "@tanstack/react-router";
+import { HeadContent, Link, Outlet, Scripts, createRootRoute, useRouterState } from "@tanstack/react-router";
 
 import { AssistantFab } from "@/components/site/assistant-fab";
 import { SiteFooter } from "@/components/site/footer";
@@ -43,6 +43,8 @@ export const Route = createRootRoute({
 });
 
 function RootDocument({ children }: { children: ReactNode }) {
+  // Standalone previews fill the window: no header, footer or assistant.
+  const bare = useRouterState({ select: (s) => s.location.pathname.startsWith("/preview/") });
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
@@ -56,10 +58,10 @@ function RootDocument({ children }: { children: ReactNode }) {
           Skip to content
         </a>
         <TooltipProvider>
-          <SiteHeader />
+          {!bare && <SiteHeader />}
           {children}
-          <SiteFooter />
-          <AssistantFab />
+          {!bare && <SiteFooter />}
+          {!bare && <AssistantFab />}
         </TooltipProvider>
         <Scripts />
       </body>

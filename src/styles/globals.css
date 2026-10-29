@@ -13,7 +13,8 @@
 @import "@fontsource-variable/bricolage-grotesque";
 @import "./cuelark.css";
 
-@custom-variant dark (&:is(.dark *));
+/* `.light` inside a dark page (a preview set to light) opts its subtree back out of dark styles. */
+@custom-variant dark (&:is(.dark *):not(.light *));
 
 @font-face {
   font-family: "Inter Variable";
@@ -21,6 +22,20 @@
   font-weight: 100 900;
   font-style: normal;
   font-display: swap;
+}
+
+/* Compact type scale: 13px interface text, 15px reading text, 12px labels. */
+@theme {
+  --text-xs: 0.75rem;
+  --text-xs--line-height: 1.125rem;
+  --text-sm: 0.8125rem;
+  --text-sm--line-height: 1.25rem;
+  --text-base: 0.9375rem;
+  --text-base--line-height: 1.5rem;
+  --text-lg: 1.0625rem;
+  --text-lg--line-height: 1.625rem;
+  --text-xl: 1.25rem;
+  --text-xl--line-height: 1.75rem;
 }
 
 /* The standard shadcn/ui token mapping (what `shadcn init` writes); cuelark.css supplies the values. */
@@ -75,11 +90,16 @@ body {
     scroll-padding-top: 5rem;
     color-scheme: light;
   }
+  /* Grid children may shrink below their content, so a long command, URL or no-wrap row scrolls or truncates inside
+     its own box instead of widening the column (and the page, which phones then zoom out). Utilities still override. */
+  .grid > * {
+    min-width: 0;
+  }
   html.dark {
     color-scheme: dark;
   }
   body {
-    @apply bg-background font-sans text-foreground antialiased;
+    @apply bg-background font-sans text-base text-foreground antialiased;
     font-feature-settings: "cv11", "ss01";
   }
   ::selection {
@@ -98,6 +118,35 @@ body {
 }
 .shiki {
   background: transparent !important;
+}
+
+/* highlightLite (src/lib/highlight-lite.ts): the same palette as the Shiki GitHub themes, as classes. */
+.hl {
+  color: #24292e;
+}
+.hl-k { color: #d73a49; }
+.hl-s { color: #032f62; }
+.hl-c { color: #6a737d; }
+.hl-f { color: #6f42c1; }
+.hl-t { color: #22863a; }
+.hl-a { color: #6f42c1; }
+.hl-n { color: #005cc5; }
+.dark .hl { color: #e6edf3; }
+.dark .hl-k { color: #ff7b72; }
+.dark .hl-s { color: #a5d6ff; }
+.dark .hl-c { color: #8b949e; }
+.dark .hl-f { color: #d2a8ff; }
+.dark .hl-t { color: #7ee787; }
+.dark .hl-a { color: #79c0ff; }
+.dark .hl-n { color: #79c0ff; }
+
+/* An icon drawn from its static SVG file (/icons/<set>/<slug>.svg) in the current text color. */
+.icon-mask {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  background-color: currentColor;
+  mask: var(--icon) center / contain no-repeat;
 }
 
 /* A faint registration grid behind hero and preview areas. */

@@ -14,6 +14,9 @@ import { Route as DocsRouteImport } from './routes/_docs'
 import { Route as AgentsIndexRouteImport } from './routes/agents/index'
 import { Route as AgentsScenarioRouteImport } from './routes/agents/$scenario'
 import { Route as IconsIndexRouteImport } from './routes/icons/index'
+import { Route as PreviewNameRouteImport } from './routes/preview/$name'
+import { Route as ThemesIndexRouteImport } from './routes/themes/index'
+import { Route as ThemesSlugRouteImport } from './routes/themes/$slug'
 import { Route as DocsComponentsIndexRouteImport } from './routes/_docs/components/index'
 import { Route as DocsComponentsSlugRouteImport } from './routes/_docs/components/$slug'
 import { Route as DocsDocsIndexRouteImport } from './routes/_docs/docs/index'
@@ -46,6 +49,21 @@ const AgentsScenarioRoute = AgentsScenarioRouteImport.update({
 const IconsIndexRoute = IconsIndexRouteImport.update({
   id: '/icons/',
   path: '/icons/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PreviewNameRoute = PreviewNameRouteImport.update({
+  id: '/preview/$name',
+  path: '/preview/$name',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ThemesIndexRoute = ThemesIndexRouteImport.update({
+  id: '/themes/',
+  path: '/themes/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ThemesSlugRoute = ThemesSlugRouteImport.update({
+  id: '/themes/$slug',
+  path: '/themes/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DocsComponentsIndexRoute = DocsComponentsIndexRouteImport.update({
@@ -97,8 +115,11 @@ const RIconsSetFileRoute = RIconsSetFileRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/agents/$scenario': typeof AgentsScenarioRoute
+  '/preview/$name': typeof PreviewNameRoute
+  '/themes/$slug': typeof ThemesSlugRoute
   '/agents/': typeof AgentsIndexRoute
   '/icons/': typeof IconsIndexRoute
+  '/themes/': typeof ThemesIndexRoute
   '/components/$slug': typeof DocsComponentsSlugRoute
   '/docs/installation': typeof DocsDocsInstallationRoute
   '/docs/theming': typeof DocsDocsThemingRoute
@@ -112,8 +133,11 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/agents/$scenario': typeof AgentsScenarioRoute
+  '/preview/$name': typeof PreviewNameRoute
+  '/themes/$slug': typeof ThemesSlugRoute
   '/agents': typeof AgentsIndexRoute
   '/icons': typeof IconsIndexRoute
+  '/themes': typeof ThemesIndexRoute
   '/components/$slug': typeof DocsComponentsSlugRoute
   '/docs/installation': typeof DocsDocsInstallationRoute
   '/docs/theming': typeof DocsDocsThemingRoute
@@ -129,8 +153,11 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_docs': typeof DocsRouteWithChildren
   '/agents/$scenario': typeof AgentsScenarioRoute
+  '/preview/$name': typeof PreviewNameRoute
+  '/themes/$slug': typeof ThemesSlugRoute
   '/agents/': typeof AgentsIndexRoute
   '/icons/': typeof IconsIndexRoute
+  '/themes/': typeof ThemesIndexRoute
   '/_docs/components/$slug': typeof DocsComponentsSlugRoute
   '/_docs/docs/installation': typeof DocsDocsInstallationRoute
   '/_docs/docs/theming': typeof DocsDocsThemingRoute
@@ -146,8 +173,11 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/agents/$scenario'
+    | '/preview/$name'
+    | '/themes/$slug'
     | '/agents/'
     | '/icons/'
+    | '/themes/'
     | '/components/$slug'
     | '/docs/installation'
     | '/docs/theming'
@@ -161,8 +191,11 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/agents/$scenario'
+    | '/preview/$name'
+    | '/themes/$slug'
     | '/agents'
     | '/icons'
+    | '/themes'
     | '/components/$slug'
     | '/docs/installation'
     | '/docs/theming'
@@ -177,8 +210,11 @@ export interface FileRouteTypes {
     | '/'
     | '/_docs'
     | '/agents/$scenario'
+    | '/preview/$name'
+    | '/themes/$slug'
     | '/agents/'
     | '/icons/'
+    | '/themes/'
     | '/_docs/components/$slug'
     | '/_docs/docs/installation'
     | '/_docs/docs/theming'
@@ -194,8 +230,11 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   DocsRoute: typeof DocsRouteWithChildren
   AgentsScenarioRoute: typeof AgentsScenarioRoute
+  PreviewNameRoute: typeof PreviewNameRoute
+  ThemesSlugRoute: typeof ThemesSlugRoute
   AgentsIndexRoute: typeof AgentsIndexRoute
   IconsIndexRoute: typeof IconsIndexRoute
+  ThemesIndexRoute: typeof ThemesIndexRoute
   IconsSetIconRoute: typeof IconsSetIconRoute
   IconsSearchQueryRoute: typeof IconsSearchQueryRoute
   IconsSetIndexRoute: typeof IconsSetIndexRoute
@@ -237,6 +276,27 @@ declare module '@tanstack/react-router' {
       path: '/icons'
       fullPath: '/icons/'
       preLoaderRoute: typeof IconsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/preview/$name': {
+      id: '/preview/$name'
+      path: '/preview/$name'
+      fullPath: '/preview/$name'
+      preLoaderRoute: typeof PreviewNameRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/themes/': {
+      id: '/themes/'
+      path: '/themes'
+      fullPath: '/themes/'
+      preLoaderRoute: typeof ThemesIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/themes/$slug': {
+      id: '/themes/$slug'
+      path: '/themes/$slug'
+      fullPath: '/themes/$slug'
+      preLoaderRoute: typeof ThemesSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_docs/components/': {
@@ -327,8 +387,11 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   DocsRoute: DocsRouteWithChildren,
   AgentsScenarioRoute: AgentsScenarioRoute,
+  PreviewNameRoute: PreviewNameRoute,
+  ThemesSlugRoute: ThemesSlugRoute,
   AgentsIndexRoute: AgentsIndexRoute,
   IconsIndexRoute: IconsIndexRoute,
+  ThemesIndexRoute: ThemesIndexRoute,
   IconsSetIconRoute: IconsSetIconRoute,
   IconsSearchQueryRoute: IconsSearchQueryRoute,
   IconsSetIndexRoute: IconsSetIndexRoute,

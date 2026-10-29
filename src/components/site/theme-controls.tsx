@@ -2,7 +2,7 @@ import * as React from "react";
 import { Link } from "@tanstack/react-router";
 import { DicesIcon, MoonIcon, PaletteIcon, RotateCcwIcon, SunIcon } from "lucide-react";
 
-import { BASES, FONTS, PRESETS, SIGNALS, fontStack, randomTheme, resetSiteTheme, setSiteTheme, themeTokens, useSiteTheme, type SiteTheme } from "@/lib/site-theme";
+import { BASES, FONTS, PRESETS, SIGNALS, fontStack, randomTheme, resetSiteTheme, sameTheme, setSiteTheme, themeTokens, useSiteTheme, type SiteTheme } from "@/lib/site-theme";
 import { Button } from "@/registry/cuelark/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/registry/cuelark/ui/popover";
 import { Slider } from "@/registry/cuelark/ui/slider";
@@ -26,7 +26,7 @@ function Row({ label, value, children }: { label: string; value?: React.ReactNod
 /** Every theme knob, bound to the live site theme. Used in the header popover and on the theming page. */
 export function ThemeControls({ compact = false }: { compact?: boolean }) {
   const theme = useSiteTheme();
-  const presetName = PRESETS.find((p) => JSON.stringify(p.theme) === JSON.stringify(theme))?.name;
+  const presetName = PRESETS.find((p) => sameTheme(p.theme, theme))?.name;
   return (
     <div className={cn("grid", compact ? "gap-5" : "gap-6")}>
       <Row label="Preset" value={presetName ?? "Custom"}>

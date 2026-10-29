@@ -10,12 +10,14 @@
  *   --cl-marks                      crop-mark visibility (0 hides every cue mark)
  *   --cl-motion                     GSAP motion amplitude (0 off · 1 · 1.5 expressive), see lib/motion.ts
  */
-import { DEFAULT_THEME, themeTokens } from "../../lib/site-theme";
+import { DEFAULT_THEME, themeTokens, themeVars } from "../../lib/site-theme";
 
 export type CssVars = Record<string, string>;
 
 /** Colors come from the same generator as the live theme editor, so the registry default and the site never drift. */
 const palette = themeTokens(DEFAULT_THEME);
+/** Shape, density, marks, motion and brand extras (Linear's 510/590 weights) from the default theme; the font face is the project's own. */
+const { "cl-font-sans": _font, "cl-text-size": _size, "cl-tracking": _tracking, ...shape } = themeVars(DEFAULT_THEME);
 export type CssRules = { [selector: string]: string | CssRules };
 
 export const cssVars: { theme: CssVars; light: CssVars; dark: CssVars } = {
@@ -40,28 +42,25 @@ export const cssVars: { theme: CssVars; light: CssVars; dark: CssVars } = {
     "ease-cue": "cubic-bezier(0.23, 1, 0.32, 1)",
   },
   light: {
+    "cl-highlight": "oklch(1 0 0 / 0.16)",
+    "cl-shade": "oklch(0.3 0.06 262 / 0.09)",
     ...palette.light,
-    radius: "0.75rem",
-    "cl-density": "1",
-    "cl-marks": "1",
-    "cl-motion": "1",
+    ...shape,
     destructive: "oklch(0.577 0.215 27)",
     success: "oklch(0.56 0.14 150)",
     "success-foreground": "oklch(0.985 0.004 85)",
     warning: "oklch(0.66 0.15 65)",
     "warning-foreground": "oklch(0.2 0.012 75)",
-    "cl-highlight": "oklch(1 0 0 / 0.16)",
-    "cl-shade": "oklch(0.3 0.06 262 / 0.09)",
   },
   dark: {
+    "cl-highlight": "oklch(1 0 0 / 0.1)",
+    "cl-shade": "oklch(0 0 0 / 0.5)",
     ...palette.dark,
     destructive: "oklch(0.7 0.19 22)",
     success: "oklch(0.74 0.15 150)",
     "success-foreground": "oklch(0.18 0.03 150)",
     warning: "oklch(0.8 0.14 80)",
     "warning-foreground": "oklch(0.2 0.04 70)",
-    "cl-highlight": "oklch(1 0 0 / 0.1)",
-    "cl-shade": "oklch(0 0 0 / 0.5)",
   },
 };
 

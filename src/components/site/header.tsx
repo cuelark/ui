@@ -15,7 +15,7 @@ const NAV = [
   { to: "/components", label: "Components" },
   { to: "/agents", label: "Agents" },
   { to: "/icons", label: "Icons" },
-  { to: "/docs/theming", label: "Theming" },
+  { to: "/themes", label: "Themes" },
 ] as const;
 
 export function SiteHeader() {
@@ -48,7 +48,7 @@ export function SiteHeader() {
             v1.0
           </Badge>
         </Link>
-        <nav aria-label="Main" className="hidden items-center gap-1 md:flex">
+        <nav aria-label="Main" className="hidden items-center gap-1 lg:flex">
           {NAV.map((item) => (
             <Link
               key={item.to}
@@ -62,7 +62,7 @@ export function SiteHeader() {
           ))}
         </nav>
         <div className="ms-auto flex items-center gap-1.5">
-          <div className={cn("hidden sm:block", home && "lg:hidden")}>
+          <div className={cn(home && "lg:hidden")}>
             <Search />
           </div>
           <Button variant="ghost" size="icon-sm" asChild>
@@ -84,9 +84,9 @@ export function SiteHeader() {
           )}
         </div>
       </div>
-      <nav aria-label="Main (mobile)" className="flex gap-1 overflow-x-auto px-4 pb-2 md:hidden">
+      <nav aria-label="Main (mobile)" className="flex gap-1 overflow-x-auto px-4 pb-2 [scrollbar-width:none] sm:px-6 lg:hidden">
         {NAV.map((item) => (
-          <Link key={item.to} to={item.to} className="rounded-md px-2.5 py-1 text-sm whitespace-nowrap text-muted-foreground data-[status=active]:bg-muted data-[status=active]:text-foreground">
+          <Link key={item.to} to={item.to} activeOptions={{ exact: item.to === "/docs" }} className="rounded-md px-3 py-1.5 text-sm whitespace-nowrap text-muted-foreground outline-none focus-visible:ring-3 focus-visible:ring-ring/50 data-[status=active]:bg-muted data-[status=active]:text-foreground">
             {item.label}
           </Link>
         ))}

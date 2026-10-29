@@ -8,6 +8,8 @@ import { POPULAR_SEARCHES } from "../src/lib/icon-seo.ts";
 import { join } from "node:path";
 import { components } from "../src/content/components.ts";
 import { SCENARIOS, ZONES } from "../src/content/agent-guide.ts";
+import { THEMES, themeItem } from "../src/content/themes.ts";
+import { themeTokens, themeVars } from "../src/lib/site-theme.ts";
 import { DOC_PAGES, SITE, registryUrl } from "../src/content/site.ts";
 import { css, cssVars, type CssRules } from "../src/registry/cuelark/theme.ts";
 
@@ -42,6 +44,21 @@ export function buildRegistry() {
     css,
     files: [],
   };
+
+  // One installable item per gallery theme: its palette and shape over the base tokens (which it pulls in).
+  const themes = THEMES.map((t) => {
+    const tokens = themeTokens(t.theme);
+    const { "cl-font-sans": _font, "cl-text-size": _size, "cl-tracking": _tracking, ...shape } = themeVars(t.theme);
+    return {
+      name: themeItem(t.slug),
+      type: "registry:theme",
+      title: `${t.name} theme`,
+      description: `${t.summary} Light and dark mode. Font: ${t.font}`,
+      registryDependencies: [registryUrl("theme")],
+      cssVars: { light: { ...tokens.light, ...shape }, dark: tokens.dark },
+      files: [],
+    };
+  });
 
   const motion = {
     name: "motion",
@@ -87,7 +104,7 @@ export function buildRegistry() {
     $schema: "https://ui.shadcn.com/schema/registry.json",
     name: "cuelark",
     homepage: SITE.url,
-    items: [theme, motion, ...ui, ...examples],
+    items: [theme, ...themes, motion, ...ui, ...examples],
   };
 }
 
@@ -110,7 +127,7 @@ export function buildThemeCss() {
 }
 
 export function sitePaths() {
-  return ["/", "/components", "/agents", ...SCENARIOS.slice(1).map((s) => `/agents/${s.slug}`), "/icons", ...DOC_PAGES.map((p) => p.path), ...components.map((c) => `/components/${c.slug}`)];
+  return ["/", "/components", "/agents", ...SCENARIOS.slice(1).map((s) => `/agents/${s.slug}`), "/themes", ...THEMES.map((t) => `/themes/${t.slug}`), "/icons", ...DOC_PAGES.map((p) => p.path), ...components.map((c) => `/components/${c.slug}`)];
 }
 
 const urlset = (paths: string[], lastmod: string) =>
@@ -149,6 +166,12 @@ ${docs}
 ## Components
 
 ${items}
+
+## Themes
+
+Light and dark shadcn/ui themes. Install one with \`npx shadcn@latest add ${registryUrl("theme-linear")}\` (swap the name), or copy its CSS from the page.
+
+${THEMES.map((t) => `- [${t.name} theme](${SITE.url}/themes/${t.slug}): ${t.summary} Font: ${t.font} Registry item: ${registryUrl(themeItem(t.slug))}`).join("\n")}
 
 ## Agent UI: where each component goes
 

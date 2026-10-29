@@ -1,6 +1,6 @@
 import { DicesIcon } from "lucide-react";
 
-import { PRESETS, fontStack, randomTheme, setSiteTheme, themeCss, themeTokens, useSiteTheme } from "@/lib/site-theme";
+import { PRESETS, fontStack, randomTheme, sameTheme, setSiteTheme, themeCss, themeTokens, useSiteTheme } from "@/lib/site-theme";
 import { Button } from "@/registry/cuelark/ui/button";
 import { CopyButton } from "@/registry/cuelark/ui/copy-button";
 import { cn } from "@/lib/utils";
@@ -13,7 +13,7 @@ export function ThemePresets() {
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
         {PRESETS.map((p) => {
           const t = themeTokens(p.theme).light;
-          const active = JSON.stringify(p.theme) === JSON.stringify(current);
+          const active = sameTheme(p.theme, current);
           const r = `${p.theme.radius}rem`;
           return (
             <article
