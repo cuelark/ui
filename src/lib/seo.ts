@@ -10,15 +10,17 @@ type SeoInput = {
   jsonLd?: Record<string, unknown>[];
   /** Keep thin pages (e.g. empty search results) out of the index while still following their links. */
   noindex?: boolean;
+  /** Absolute URL of a 1200×630 share image; defaults to the site card. */
+  image?: string;
 };
 
 const absolute = (path: string) => `${SITE.url}${path === "/" ? "" : path}`;
 
 /** Head tags for a page: title, description, canonical, Open Graph, Twitter card and JSON-LD. */
-export function seo({ title, description, path, keywords, type = "website", jsonLd = [], noindex = false }: SeoInput) {
+export function seo({ title, description, path, keywords, type = "website", jsonLd = [], noindex = false, image: imageUrl }: SeoInput) {
   const url = absolute(path);
   const fullTitle = title === SITE.title ? title : `${title} · ${SITE.name}`;
-  const image = `${SITE.url}/og.png`;
+  const image = imageUrl ?? `${SITE.url}/og.png`;
   return {
     meta: [
       { title: fullTitle },

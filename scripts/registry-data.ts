@@ -7,6 +7,7 @@ import { setSlug } from "../src/lib/icon-slugs.ts";
 import { POPULAR_SEARCHES } from "../src/lib/icon-seo.ts";
 import { join } from "node:path";
 import { components } from "../src/content/components.ts";
+import { SCENARIOS, ZONES } from "../src/content/agent-guide.ts";
 import { DOC_PAGES, SITE, registryUrl } from "../src/content/site.ts";
 import { css, cssVars, type CssRules } from "../src/registry/cuelark/theme.ts";
 
@@ -109,7 +110,7 @@ export function buildThemeCss() {
 }
 
 export function sitePaths() {
-  return ["/", "/components", "/agents", "/icons", ...DOC_PAGES.map((p) => p.path), ...components.map((c) => `/components/${c.slug}`)];
+  return ["/", "/components", "/agents", ...SCENARIOS.slice(1).map((s) => `/agents/${s.slug}`), "/icons", ...DOC_PAGES.map((p) => p.path), ...components.map((c) => `/components/${c.slug}`)];
 }
 
 const urlset = (paths: string[], lastmod: string) =>
@@ -148,6 +149,12 @@ ${docs}
 ## Components
 
 ${items}
+
+## Agent UI: where each component goes
+
+Live, inspectable demos: ${SCENARIOS.map((s, i) => `[${s.title}](${SITE.url}/agents${i ? `/${s.slug}` : ""})`).join(", ")}.
+
+${ZONES.map((z) => `### ${z.name}\n\n${z.summary}\n\n${z.items.map((it) => `- ${components.find((c) => c.slug === it.slug)?.name ?? it.slug}: ${it.when}${it.avoid ? ` Avoid: ${it.avoid}` : ""}`).join("\n")}`).join("\n\n")}
 
 ## Optional
 

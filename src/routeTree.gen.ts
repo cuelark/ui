@@ -11,7 +11,8 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as DocsRouteImport } from './routes/_docs'
-import { Route as DocsAgentsRouteImport } from './routes/_docs/agents'
+import { Route as AgentsIndexRouteImport } from './routes/agents/index'
+import { Route as AgentsScenarioRouteImport } from './routes/agents/$scenario'
 import { Route as IconsIndexRouteImport } from './routes/icons/index'
 import { Route as DocsComponentsIndexRouteImport } from './routes/_docs/components/index'
 import { Route as DocsComponentsSlugRouteImport } from './routes/_docs/components/$slug'
@@ -32,10 +33,15 @@ const DocsRoute = DocsRouteImport.update({
   id: '/_docs',
   getParentRoute: () => rootRouteImport,
 } as any)
-const DocsAgentsRoute = DocsAgentsRouteImport.update({
-  id: '/agents',
-  path: '/agents',
-  getParentRoute: () => DocsRoute,
+const AgentsIndexRoute = AgentsIndexRouteImport.update({
+  id: '/agents/',
+  path: '/agents/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AgentsScenarioRoute = AgentsScenarioRouteImport.update({
+  id: '/agents/$scenario',
+  path: '/agents/$scenario',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const IconsIndexRoute = IconsIndexRouteImport.update({
   id: '/icons/',
@@ -90,7 +96,8 @@ const RIconsSetFileRoute = RIconsSetFileRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/agents': typeof DocsAgentsRoute
+  '/agents/$scenario': typeof AgentsScenarioRoute
+  '/agents/': typeof AgentsIndexRoute
   '/icons/': typeof IconsIndexRoute
   '/components/$slug': typeof DocsComponentsSlugRoute
   '/docs/installation': typeof DocsDocsInstallationRoute
@@ -104,7 +111,8 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/agents': typeof DocsAgentsRoute
+  '/agents/$scenario': typeof AgentsScenarioRoute
+  '/agents': typeof AgentsIndexRoute
   '/icons': typeof IconsIndexRoute
   '/components/$slug': typeof DocsComponentsSlugRoute
   '/docs/installation': typeof DocsDocsInstallationRoute
@@ -120,7 +128,8 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_docs': typeof DocsRouteWithChildren
-  '/_docs/agents': typeof DocsAgentsRoute
+  '/agents/$scenario': typeof AgentsScenarioRoute
+  '/agents/': typeof AgentsIndexRoute
   '/icons/': typeof IconsIndexRoute
   '/_docs/components/$slug': typeof DocsComponentsSlugRoute
   '/_docs/docs/installation': typeof DocsDocsInstallationRoute
@@ -136,7 +145,8 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | '/agents'
+    | '/agents/$scenario'
+    | '/agents/'
     | '/icons/'
     | '/components/$slug'
     | '/docs/installation'
@@ -150,6 +160,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/agents/$scenario'
     | '/agents'
     | '/icons'
     | '/components/$slug'
@@ -165,7 +176,8 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/_docs'
-    | '/_docs/agents'
+    | '/agents/$scenario'
+    | '/agents/'
     | '/icons/'
     | '/_docs/components/$slug'
     | '/_docs/docs/installation'
@@ -181,6 +193,8 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   DocsRoute: typeof DocsRouteWithChildren
+  AgentsScenarioRoute: typeof AgentsScenarioRoute
+  AgentsIndexRoute: typeof AgentsIndexRoute
   IconsIndexRoute: typeof IconsIndexRoute
   IconsSetIconRoute: typeof IconsSetIconRoute
   IconsSearchQueryRoute: typeof IconsSearchQueryRoute
@@ -204,12 +218,19 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DocsRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_docs/agents': {
-      id: '/_docs/agents'
+    '/agents/': {
+      id: '/agents/'
       path: '/agents'
-      fullPath: '/agents'
-      preLoaderRoute: typeof DocsAgentsRouteImport
-      parentRoute: typeof DocsRoute
+      fullPath: '/agents/'
+      preLoaderRoute: typeof AgentsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/agents/$scenario': {
+      id: '/agents/$scenario'
+      path: '/agents/$scenario'
+      fullPath: '/agents/$scenario'
+      preLoaderRoute: typeof AgentsScenarioRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/icons/': {
       id: '/icons/'
@@ -285,7 +306,6 @@ declare module '@tanstack/react-router' {
 }
 
 interface DocsRouteChildren {
-  DocsAgentsRoute: typeof DocsAgentsRoute
   DocsComponentsSlugRoute: typeof DocsComponentsSlugRoute
   DocsDocsInstallationRoute: typeof DocsDocsInstallationRoute
   DocsDocsThemingRoute: typeof DocsDocsThemingRoute
@@ -294,7 +314,6 @@ interface DocsRouteChildren {
 }
 
 const DocsRouteChildren: DocsRouteChildren = {
-  DocsAgentsRoute: DocsAgentsRoute,
   DocsComponentsSlugRoute: DocsComponentsSlugRoute,
   DocsDocsInstallationRoute: DocsDocsInstallationRoute,
   DocsDocsThemingRoute: DocsDocsThemingRoute,
@@ -307,6 +326,8 @@ const DocsRouteWithChildren = DocsRoute._addFileChildren(DocsRouteChildren)
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   DocsRoute: DocsRouteWithChildren,
+  AgentsScenarioRoute: AgentsScenarioRoute,
+  AgentsIndexRoute: AgentsIndexRoute,
   IconsIndexRoute: IconsIndexRoute,
   IconsSetIconRoute: IconsSetIconRoute,
   IconsSearchQueryRoute: IconsSearchQueryRoute,

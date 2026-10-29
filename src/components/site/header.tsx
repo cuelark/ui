@@ -20,6 +20,8 @@ const NAV = [
 
 export function SiteHeader() {
   const home = useRouterState({ select: (s) => s.location.pathname === "/" });
+  // Full-width pages (the agent demos) widen the bar with them so the logo lines up with the content.
+  const wide = useRouterState({ select: (s) => s.location.pathname.startsWith("/agents") });
   const [scrolled, setScrolled] = React.useState(false);
   React.useEffect(() => {
     if (!home) return;
@@ -39,7 +41,7 @@ export function SiteHeader() {
         home && !floating && "bg-background/80 shadow-[0_1px_0_var(--border)] backdrop-blur-md",
       )}
     >
-      <div className={cn("mx-auto flex h-14 max-w-7xl items-center gap-6 px-4 sm:px-6", floating && "mt-2 h-18 sm:px-10")}>
+      <div className={cn("mx-auto flex h-14 max-w-7xl items-center gap-6 px-4 sm:px-6", wide && "max-w-[100rem] lg:px-8", floating && "mt-2 h-18 sm:px-10")}>
         <Link to="/" className="flex shrink-0 items-center gap-2 rounded-md outline-none focus-visible:ring-3 focus-visible:ring-ring/50" aria-label={`${SITE.name} home`}>
           <Logo />
           <Badge mono size="sm" variant="outline" className="hidden sm:inline-flex">
