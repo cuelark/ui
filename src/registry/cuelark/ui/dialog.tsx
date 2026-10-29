@@ -11,7 +11,7 @@ import { cn } from "@/lib/utils";
 /** Rise into place, then the crop marks close in on the panel like a registration lock. */
 function enter(node: HTMLElement | null) {
   if (!node) return;
-  if (node.dataset.entered) return;
+  if (node.dataset.entered !== undefined) return;
   node.dataset.entered = "";
   enterOnce(node, (s) => ({ opacity: 0, y: 10 * s, scale: 1 - 0.03 * s }), { duration: 0.28 });
   if (motionScale(node)) marksIn(node, 0.06);

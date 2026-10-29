@@ -29,7 +29,7 @@ function ChainOfThought({ className, title = "Chain of thought", defaultOpen = t
 
   return (
     <Collapsible data-slot="chain-of-thought" defaultOpen={defaultOpen} className={cn("grid gap-3", className)} {...props}>
-      <CollapsibleTrigger className="group/cot grid w-full max-w-sm gap-1.5 rounded-md text-left outline-none focus-visible:ring-3 focus-visible:ring-ring/50">
+      <CollapsibleTrigger className="group/cot grid w-full gap-1.5 rounded-md text-left outline-none focus-visible:ring-3 focus-visible:ring-ring/50">
         <span className="flex items-center gap-2 text-sm font-medium">
           {title}
           {running && <span aria-hidden="true" className="size-1.5 animate-pulse rounded-full bg-signal" />}
@@ -42,7 +42,8 @@ function ChainOfThought({ className, title = "Chain of thought", defaultOpen = t
           <span ref={bar} className="absolute inset-0 origin-left scale-x-0 bg-signal" />
         </span>
       </CollapsibleTrigger>
-      <CollapsibleContent>
+      {/* Room for the active marker's ring, which the collapsible's overflow clip would otherwise cut. */}
+      <CollapsibleContent className="-m-2 p-2">
         <ol className="grid">{children}</ol>
       </CollapsibleContent>
     </Collapsible>
@@ -101,7 +102,7 @@ function ChainOfThoughtStep({ status = "complete", label, icon, className, child
   React.useLayoutEffect(() => {
     const detail = ref.current?.querySelector<HTMLElement>('[data-part="detail"]');
     const inner = detail?.firstElementChild;
-    if (!detail || !inner || detail.dataset.shown || !motionScale(detail)) return;
+    if (!detail || !inner || detail.dataset.shown !== undefined || !motionScale(detail)) return;
     detail.dataset.shown = "";
     // Grow the space smoothly so the steps below glide down instead of jumping, then stagger the content in.
     gsap.fromTo(detail, { height: 0, opacity: 0 }, { height: "auto", opacity: 1, duration: 0.35, ease: "cue", clearProps: "height,opacity" });
@@ -113,7 +114,7 @@ function ChainOfThoughtStep({ status = "complete", label, icon, className, child
   return (
     <li ref={ref} data-slot="chain-of-thought-step" data-status={status} className={cn("group/step relative grid grid-cols-[1.25rem_minmax(0,1fr)] gap-x-3 pb-5 last:pb-0", className)} {...props}>
       {/* Rail: a quiet track, with a signal fill that grows when the step completes. */}
-      <span aria-hidden="true" className="absolute top-6 bottom-0.5 left-[0.5625rem] w-px bg-border group-last/step:hidden">
+      <span aria-hidden="true" className="absolute top-3 -bottom-3 left-[0.5625rem] w-px bg-border group-last/step:hidden">
         <span data-part="fill" className="absolute inset-0 origin-top scale-y-0 bg-signal" />
       </span>
       <span className="relative z-10 mt-0.5 grid size-5 place-items-center">
