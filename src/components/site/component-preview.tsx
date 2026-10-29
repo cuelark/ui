@@ -33,7 +33,6 @@ export function ComponentPreview({ name, code, className }: ComponentPreviewProp
       <TabsContent value="preview">
         <div className="cue-marks relative rounded-xl border border-border bg-card">
           <div className="relative flex min-h-80 items-center justify-center overflow-hidden rounded-[inherit] p-6 sm:p-10">
-            <div aria-hidden="true" className="bg-grid pointer-events-none absolute inset-0 [mask-image:radial-gradient(ellipse_at_center,black,transparent_75%)] opacity-60" />
             <div key={run} className="relative flex w-full justify-center">
               <Example />
             </div>
