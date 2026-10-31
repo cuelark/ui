@@ -3,7 +3,7 @@ import { Link, useRouterState } from "@tanstack/react-router";
 import { components, SECTIONS } from "@/content/components";
 import type { Section } from "@/content/types";
 import { DOC_PAGES, SITE } from "@/content/site";
-import { Logo } from "./logo";
+import { Logo, XMark } from "./logo";
 import { cn } from "@/lib/utils";
 
 /** Link styling set once per list (it repeats on every page). */
@@ -74,10 +74,23 @@ export function SiteFooter() {
               <Link to="/components" className="rounded-full border border-border px-3 py-1.5 font-medium transition-colors hover:bg-muted">
                 All components
               </Link>
-              <Link to="/docs/theming" className="rounded-full border border-border px-3 py-1.5 font-medium transition-colors hover:bg-muted">
-                Theme editor
+              <Link to="/themes" className="rounded-full border border-border px-3 py-1.5 font-medium transition-colors hover:bg-muted">
+                Themes
               </Link>
             </div>
+            <a
+              href={SITE.x.url}
+              rel="noopener me"
+              className="group inline-flex w-fit items-center gap-2.5 rounded-xl border border-border bg-card py-2 ps-3 pe-4 text-sm shadow-control transition-[border-color,box-shadow] hover:border-foreground/20 hover:shadow-raised"
+            >
+              <span className="grid size-7 place-items-center rounded-lg bg-foreground text-background">
+                <XMark />
+              </span>
+              <span className="grid">
+                <span className="font-medium">Follow {SITE.x.handle}</span>
+                <span className="text-xs text-muted-foreground">New agent components, every week</span>
+              </span>
+            </a>
           </div>
           <nav aria-label="Documentation and resources" className="grid grid-cols-2 gap-8 sm:grid-cols-3">
             <FooterColumn title="Docs" links={[...DOC_PAGES.map((p) => ({ to: p.path, label: p.title })), { to: "/components", label: "All components" }, { to: "/agents", label: "Agent UI kit" }, { to: "/themes", label: "Themes" }, { to: "/icons", label: "50,000+ icons" }]} />
@@ -86,6 +99,7 @@ export function SiteFooter() {
               <ul className="grid gap-2 text-sm">
                 {[
                   { href: SITE.github, label: "GitHub" },
+                  { href: SITE.x.url, label: `X ${SITE.x.handle}` },
                   { href: "/r/registry.json", label: "shadcn registry" },
                   { href: "/llms.txt", label: "llms.txt" },
                   { href: "/llms-full.txt", label: "llms-full.txt" },

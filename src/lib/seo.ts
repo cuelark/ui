@@ -1,4 +1,5 @@
 import { SITE } from "@/content/site";
+import { OG_IMAGE } from "@/lib/og";
 
 type SeoInput = {
   title: string;
@@ -20,7 +21,7 @@ const absolute = (path: string) => `${SITE.url}${path === "/" ? "" : path}`;
 export function seo({ title, description, path, keywords, type = "website", jsonLd = [], noindex = false, image: imageUrl }: SeoInput) {
   const url = absolute(path);
   const fullTitle = title === SITE.title ? title : `${title} · ${SITE.name}`;
-  const image = imageUrl ?? `${SITE.url}/og.png`;
+  const image = imageUrl ?? OG_IMAGE;
   return {
     meta: [
       { title: fullTitle },
@@ -37,6 +38,8 @@ export function seo({ title, description, path, keywords, type = "website", json
       { property: "og:image:height", content: "630" },
       { property: "og:image:alt", content: `${SITE.name}: ${title}` },
       { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:site", content: SITE.x.handle },
+      { name: "twitter:creator", content: SITE.x.handle },
       { name: "twitter:title", content: fullTitle },
       { name: "twitter:description", content: description },
       { name: "twitter:image", content: image },
@@ -50,7 +53,7 @@ const ORG_ID = `${SITE.parent.url}/#organization`;
 const SITE_ID = `${SITE.url}/#website`;
 
 export const ld = {
-  organization: () => ({ "@type": "Organization", "@id": ORG_ID, name: SITE.parent.name, url: SITE.parent.url, email: SITE.contact, sameAs: [SITE.github] }),
+  organization: () => ({ "@type": "Organization", "@id": ORG_ID, name: SITE.parent.name, url: SITE.parent.url, email: SITE.contact, sameAs: [SITE.github, SITE.x.url] }),
   website: () => ({ "@type": "WebSite", "@id": SITE_ID, name: SITE.name, url: SITE.url, description: SITE.description, publisher: { "@id": ORG_ID } }),
   breadcrumbs: (items: { name: string; path: string }[]) => ({
     "@type": "BreadcrumbList",

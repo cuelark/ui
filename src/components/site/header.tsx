@@ -4,7 +4,7 @@ import { Link, useRouterState } from "@tanstack/react-router";
 import { SITE } from "@/content/site";
 import { Badge } from "@/registry/cuelark/ui/badge";
 import { Button } from "@/registry/cuelark/ui/button";
-import { GithubMark, Logo } from "./logo";
+import { GithubMark, Logo, XMark } from "./logo";
 import { Search } from "./search";
 import { ThemeCustomizer } from "./theme-controls";
 import { ThemeToggle } from "./theme-toggle";
@@ -68,6 +68,11 @@ export function SiteHeader() {
           <Button variant="ghost" size="icon-sm" asChild>
             <a href={SITE.github} aria-label="Cuelark UI on GitHub" rel="noopener">
               <GithubMark />
+            </a>
+          </Button>
+          <Button variant="ghost" size="icon-sm" asChild>
+            <a href={SITE.x.url} aria-label={`Follow ${SITE.x.handle} on X`} title={`Follow ${SITE.x.handle}`} rel="noopener me">
+              <XMark />
             </a>
           </Button>
           <ThemeCustomizer />

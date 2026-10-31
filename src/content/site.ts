@@ -5,6 +5,7 @@ export const SITE = {
   description:
     "Open-source React components for shadcn/ui: an AI agent UI kit (chat, reasoning, tool calls, plans, citations, traces), GSAP-animated effects and accessible Radix primitives. Themeable with CSS variables, installed as source with the shadcn CLI.",
   github: "https://github.com/cuelark/ui",
+  x: { handle: "@cuelark_", url: "https://x.com/cuelark_" },
   parent: { name: "Cuelark", url: "https://cuelark.com" },
   contact: "contact@cuelark.com",
 } as const;
