@@ -104,6 +104,7 @@ export function SiteFooter() {
                   { href: "/llms.txt", label: "llms.txt" },
                   { href: "/llms-full.txt", label: "llms-full.txt" },
                   { href: "/sitemap.xml", label: "Sitemap" },
+                  { href: "https://tools.cuelark.com", label: "Free tools" },
                 ].map((l) => (
                   <li key={l.href}>
                     <a href={l.href} className="inline-block py-1 text-muted-foreground transition-colors hover:text-foreground">
