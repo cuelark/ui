@@ -15,12 +15,31 @@ type SeoInput = {
   image?: string;
 };
 
+/** Search snippets cut off around 160 characters: keep whole sentences that fit, else cut at a word. */
+export function fitDescription(text: string, max = 160) {
+  const clean = text.replace(/\s+/g, " ").trim();
+  if (clean.length <= max) return clean;
+  const sentences = clean.match(/[^.!?]+[.!?]+(\s|$)/g) ?? [clean];
+  let out = "";
+  for (const s of sentences) {
+    if ((out + s).trim().length > max) break;
+    out += s;
+  }
+  out = out.trim();
+  if (out.length >= 100) return out;
+  const cut = clean.slice(0, max - 1);
+  return `${cut.slice(0, cut.lastIndexOf(" ")).replace(/[,;:(\s]+$/, "")}…`;
+}
+
 const absolute = (path: string) => `${SITE.url}${path === "/" ? "" : path}`;
 
 /** Head tags for a page: title, description, canonical, Open Graph, Twitter card and JSON-LD. */
-export function seo({ title, description, path, keywords, type = "website", jsonLd = [], noindex = false, image: imageUrl }: SeoInput) {
+export function seo({ title, description: rawDescription, path, keywords, type = "website", jsonLd = [], noindex = false, image: imageUrl }: SeoInput) {
   const url = absolute(path);
-  const fullTitle = title === SITE.title ? title : `${title} · ${SITE.name}`;
+  const description = fitDescription(rawDescription);
+  const suffixed = `${title} · ${SITE.name}`;
+  // Keep titles within ~60 characters: drop the brand suffix when it would push the title past that.
+  const fullTitle = title === SITE.title || suffixed.length > 60 ? title : suffixed;
   const image = imageUrl ?? OG_IMAGE;
   return {
     meta: [

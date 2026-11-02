@@ -20,8 +20,8 @@ export const Route = createFileRoute("/icons/$set/")({
     if (!loaderData) return {};
     const { meta, page, setSlug } = loaderData;
     const n = meta.name;
-    const title = `${n} Icons: ${meta.count.toLocaleString()} Free SVG & React Icons${page > 1 ? ` (Page ${page})` : ""}`;
-    const description = `Browse all ${meta.count.toLocaleString()} ${n} icons, free under the ${licenseLabel(meta.license)}. Download SVGs, copy static or animated React components (react-icons/${meta.id}), or install any icon with the shadcn CLI.`;
+    const title = `${n} Icons: ${meta.count.toLocaleString()} Free SVG & React Icons${page > 1 ? `, Page ${page}` : ""}`;
+    const description = `Browse all ${meta.count.toLocaleString()} free ${n} icons (${licenseLabel(meta.license)}). Download SVGs or copy static and animated React components for your app.`;
     return seo({
       title,
       description,

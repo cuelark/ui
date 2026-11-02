@@ -24,7 +24,7 @@ export const Route = createFileRoute("/icons/search/$query")({
     const path = `/icons/search/${kebab(q) || params.query}`;
     return seo({
       title: `${T} Icons: ${total.toLocaleString()} Free SVG & React Icons${page > 1 ? ` (Page ${page})` : ""}`,
-      description: `Find ${total.toLocaleString()} free ${q} icons${relatedTerms(q, 3).length ? ` (also ${relatedTerms(q, 3).join(", ")} icons)` : ""} from Lucide, Heroicons, Font Awesome, Material Design, Phosphor, Tabler and more. Download SVGs or copy static and animated React components, installable with the shadcn CLI.`,
+      description: `Browse ${total.toLocaleString()} free ${q} icons from Lucide, Heroicons, Font Awesome, Phosphor and more. Download the SVG or copy a React component in one click.`,
       // Filtered (?set=) and paged variants all canonicalize to the main results page.
       path,
       // Only the prerendered popular searches are indexed; any other term is rendered on request (and robots.txt
@@ -55,7 +55,10 @@ function SearchPage() {
   const T = titleCase(q);
   const synonyms = relatedTerms(q, 10);
   const related = [...new Set([...synonyms.map(kebab), ...POPULAR_SEARCHES.filter((t) => t !== kebab(q) && (t.includes(q.split(" ")[0]!) || q.includes(t.split("-")[0]!)))])].filter((t) => t !== kebab(q)).slice(0, 14);
-  const popular = POPULAR_SEARCHES.filter((t) => !related.includes(t) && t !== kebab(q)).slice(0, 24);
+  // Neighbouring searches (wrapping round the list) instead of always the first 24, so every search page gets inlinks.
+  const all = [...new Set(POPULAR_SEARCHES)];
+  const at = Math.max(0, all.indexOf(kebab(q)));
+  const popular = [...all.slice(at + 1), ...all.slice(0, at)].filter((t) => !related.includes(t) && t !== kebab(q)).slice(0, 24);
   return (
     <main id="main" className="mx-auto grid max-w-7xl gap-8 px-4 py-10 sm:px-6">
       <nav aria-label="Breadcrumb" className="flex items-center gap-1.5 text-sm text-muted-foreground">

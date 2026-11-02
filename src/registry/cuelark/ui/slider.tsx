@@ -122,6 +122,7 @@ function Slider({ className, defaultValue, value, min = 0, max = 100, onValueCha
         {values.map((v, i) => (
           <SliderPrimitive.Thumb
             key={i}
+            aria-label={props["aria-label"] ? (values.length > 1 ? `${props["aria-label"]} ${i + 1}` : props["aria-label"]) : undefined}
             data-slot="slider-thumb"
             className="relative block size-4.5 shrink-0 cursor-grab rounded-full border border-primary/80 bg-background shadow-control outline-none transition-[box-shadow] duration-150 ease-cue hover:ring-4 hover:ring-ring/20 focus-visible:ring-4 focus-visible:ring-ring/40 active:cursor-grabbing disabled:pointer-events-none"
           >

@@ -1,13 +1,11 @@
-import type { ReactNode } from "react";
+import { Suspense, lazy, type ReactNode } from "react";
 import { Link, createFileRoute } from "@tanstack/react-router";
 import { AccessibilityIcon, ArrowRightIcon, BoldIcon, CodeIcon, CrosshairIcon, ItalicIcon, PaletteIcon, UnderlineIcon } from "lucide-react";
 import { PiSparkleFill as SparklesIcon } from "react-icons/pi";
 
 import { examples } from "@/components/site/examples";
-import { HeroApp } from "@/components/site/hero-app";
 import { FluidBackdrop } from "@/components/site/fluid-backdrop";
 import { HeroPrompt } from "@/components/site/hero-prompt";
-import { MotionDial } from "@/components/site/motion-dial";
 import { components, SECTIONS } from "@/content/components";
 import { SITE } from "@/content/site";
 import { ld, seo } from "@/lib/seo";
@@ -28,6 +26,10 @@ import { TextReveal } from "@/registry/cuelark/ui/text-reveal";
 import { ToggleGroup, ToggleGroupItem } from "@/registry/cuelark/ui/toggle-group";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/registry/cuelark/ui/tooltip";
 import { cn } from "@/lib/utils";
+
+// Heavy, below-the-fold demos load in their own chunks and hydrate after the hero, so they don't block first paint.
+const HeroApp = lazy(() => import("@/components/site/hero-app").then((m) => ({ default: m.HeroApp })));
+const MotionDial = lazy(() => import("@/components/site/motion-dial").then((m) => ({ default: m.MotionDial })));
 
 const FAQ = [
   {
@@ -79,7 +81,9 @@ function Home() {
       <Effects />
       <Bento />
       <section aria-label="Motion" className="mx-auto mt-32 max-w-6xl px-4 sm:px-6">
-        <MotionDial />
+        <Suspense fallback={null}>
+          <MotionDial />
+        </Suspense>
       </section>
       <Principles />
       <Catalog />
@@ -148,7 +152,9 @@ function BuiltWith() {
 function Preview() {
   return (
     <section aria-label="Preview" className="relative mx-auto mt-20 max-w-6xl px-4 sm:px-6">
-      <HeroApp />
+      <Suspense fallback={null}>
+        <HeroApp />
+      </Suspense>
     </section>
   );
 }

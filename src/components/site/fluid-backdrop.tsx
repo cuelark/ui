@@ -3,9 +3,6 @@ import * as React from "react";
 import { gsap, motionScale, useGSAP } from "@/lib/motion";
 import { cn } from "@/lib/utils";
 
-/** SVG film grain, inlined so it costs one tiny data URI and no request. */
-const GRAIN =
-  "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\")";
 
 /** Each blob: where it sits, how big, its color mix, and how far it wanders. */
 const BLOBS = [
@@ -61,7 +58,13 @@ export function FluidBackdrop({ className }: { className?: string }) {
         className="absolute top-[18%] left-[-12%] h-[42%] w-[70%] rounded-full blur-[48px] will-change-transform"
         style={{ transform: "rotate(-32deg)", background: "radial-gradient(closest-side, color-mix(in oklch, var(--background) 92%, transparent), transparent)" }}
       />
-      <div className="absolute inset-0 opacity-[0.22] mix-blend-overlay" style={{ backgroundImage: GRAIN }} />
+      {/* Inline SVG rather than a CSS background image, so the decorative grain is never picked as the LCP element. */}
+      <svg className="absolute inset-0 size-full opacity-[0.22] mix-blend-overlay">
+        <filter id="cue-grain">
+          <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" stitchTiles="stitch" />
+        </filter>
+        <rect width="100%" height="100%" filter="url(#cue-grain)" />
+      </svg>
     </div>
   );
 }

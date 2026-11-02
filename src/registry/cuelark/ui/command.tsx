@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { Command as CommandPrimitive } from "cmdk";
+import { Command as CommandPrimitive, useCommandState } from "cmdk";
 import { SearchIcon } from "lucide-react";
 
 import { gsap, motionScale, useMergedRef } from "@/lib/motion";
@@ -115,8 +115,11 @@ function CommandGroup({ className, ...props }: React.ComponentProps<typeof Comma
   );
 }
 
-function CommandSeparator({ className, ...props }: React.ComponentProps<typeof CommandPrimitive.Separator>) {
-  return <CommandPrimitive.Separator data-slot="command-separator" className={cn("cue-dash-b -mx-1 h-px", className)} {...props} />;
+/** A visual divider. Presentational (not role="separator"), so a listbox only holds options and groups, as ARIA requires. */
+function CommandSeparator({ className, alwaysRender, ...props }: React.ComponentProps<"div"> & { alwaysRender?: boolean }) {
+  const searching = useCommandState((state) => Boolean(state.search));
+  if (searching && !alwaysRender) return null;
+  return <div role="none" cmdk-separator="" data-slot="command-separator" className={cn("cue-dash-b -mx-1 h-px", className)} {...props} />;
 }
 
 function CommandItem({ className, ...props }: React.ComponentProps<typeof CommandPrimitive.Item>) {

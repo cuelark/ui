@@ -28,7 +28,16 @@ export const Route = createFileRoute("/_docs/components/$slug")({
     if (!doc) return {};
     const path = `/components/${doc.slug}`;
     const title = `${doc.name}: ${doc.description.replace(/\.$/, "")}`;
-    const description = `${doc.intro.split(". ").slice(0, 2).join(". ").replace(/\.?$/, ".")} Install the ${doc.name} component with the shadcn CLI.`.slice(0, 300);
+    // As many whole intro sentences as fit in a ~160-character snippet, then the install line and, if room, the license.
+    const tail = ` Install the ${doc.name} component with the shadcn CLI.`;
+    let description = "";
+    for (const sentence of doc.intro.split(/(?<=\.)\s+/)) {
+      const next = `${description} ${sentence.replace(/\.?$/, ".")}`.trim();
+      if ((next + tail).length > 160 && description) break;
+      description = next;
+    }
+    if ((description + tail).length <= 160) description += tail;
+    if (description.length < 120 && description.length + 40 <= 160) description += " Accessible, themeable and MIT licensed.";
     return seo({
       title: `React ${doc.name} component for shadcn/ui`,
       description,

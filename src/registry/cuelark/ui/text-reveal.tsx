@@ -39,7 +39,8 @@ function TextReveal({ as: Tag = "p", split = "words", effect = "rise", trigger =
       SplitText.create(el, {
         type: split === "chars" ? "words,chars" : split,
         mask: effect === "rise" ? split : undefined,
-        aria: "auto",
+        // aria-label is prohibited on generic elements (span, div): there, leave the word spans readable instead.
+        aria: (Tag === "span" || Tag === "div") && split !== "chars" ? "none" : "auto",
         autoSplit: true,
         onSplit(self) {
           const targets = self[split];

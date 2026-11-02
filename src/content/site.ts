@@ -1,9 +1,9 @@
 export const SITE = {
   name: "Cuelark UI",
   url: "https://ui.cuelark.com",
-  title: "Cuelark UI: animated shadcn/ui components and AI agent UI kit",
+  title: "Cuelark UI: animated shadcn/ui components & AI agent UI kit",
   description:
-    "Open-source React components for shadcn/ui: an AI agent UI kit (chat, reasoning, tool calls, plans, citations, traces), GSAP-animated effects and accessible Radix primitives. Themeable with CSS variables, installed as source with the shadcn CLI.",
+    "Open-source React components for shadcn/ui: an AI agent UI kit, GSAP-animated effects and accessible primitives, installed as source with the shadcn CLI.",
   github: "https://github.com/cuelark/ui",
   x: { handle: "@cuelark_", url: "https://x.com/cuelark_" },
   parent: { name: "Cuelark", url: "https://cuelark.com" },
@@ -17,17 +17,17 @@ export const DOC_PAGES: DocPage[] = [
   {
     path: "/docs",
     title: "Introduction",
-    description: "What Cuelark UI is, how it relates to shadcn/ui, and the ideas behind its style.",
+    description: "What Cuelark UI is, how it relates to shadcn/ui, and the ideas behind its precise, tactile style. Free, open-source React components you install and own.",
   },
   {
     path: "/docs/installation",
     title: "Installation",
-    description: "Add Cuelark UI components to any shadcn/ui project with the shadcn CLI, by URL or by the @cuelark namespace.",
+    description: "Add Cuelark UI components to any shadcn/ui project with the shadcn CLI, by URL or by the @cuelark namespace, and connect the registry to your AI editor.",
   },
   {
     path: "/docs/theming",
     title: "Theming",
-    description: "Customize accent, radius, density and crop marks with CSS variables, and generate a theme with the live editor.",
+    description: "Customize accent, radius, density and crop marks with CSS variables, and generate a matching light and dark theme with the live editor.",
   },
 ];
 

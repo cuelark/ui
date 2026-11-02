@@ -7,9 +7,9 @@ import { getIconSets } from "@/lib/icons-server";
 import { SITE } from "@/content/site";
 import { ld, seo } from "@/lib/seo";
 
-const TITLE = "50,000+ free React icons: searchable, animated, shadcn installable";
+const TITLE = "50,000+ Free React Icons: Search, Animate, Install";
 const DESCRIPTION =
-  "Search every react-icons set (Lucide, Font Awesome, Material Design, Heroicons, Phosphor, Tabler, Remix, Bootstrap and more) in one place. Animate any icon with GSAP, copy JSX or SVG, or install it as a component with the shadcn CLI.";
+  "Search 50,000+ free icons from Lucide, Font Awesome, Material, Heroicons, Phosphor and more. Animate any icon, copy JSX or SVG, or install it with the shadcn CLI.";
 
 export const Route = createFileRoute("/icons/")({
   loader: () => getIconSets(),

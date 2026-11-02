@@ -6,7 +6,7 @@ import { SITE } from "@/content/site";
 import { ld, seo } from "@/lib/seo";
 
 const TITLE = "shadcn/ui themes: Linear, Stripe, Vercel and more";
-const DESCRIPTION = `${THEMES.length} free themes for shadcn/ui and Tailwind CSS v4, each with light and dark mode: Linear, Stripe, Vercel, Supabase, Notion, Claude and Cuelark's own. Preview them live, copy the CSS or install with the shadcn CLI.`;
+const DESCRIPTION = `${THEMES.length} free shadcn/ui themes inspired by Linear, Stripe, Vercel, Notion and more, with light and dark mode. Preview live, copy the CSS or install.`;
 export const THEMES_FAQ = [
   { q: "How do I install a shadcn/ui theme?", a: "Open a theme and run its shadcn command, for example npx shadcn@latest add https://ui.cuelark.com/r/theme-linear.json. The CLI writes the light and dark CSS variables into your global stylesheet. Or copy the CSS and paste it after your Tailwind import." },
   { q: "Do these themes work with any shadcn/ui project?", a: "Yes. They set the standard shadcn/ui variables (background, foreground, primary, muted, border, ring and the rest), so every shadcn component picks them up. Cuelark components also read the signal, density and crop-mark variables." },

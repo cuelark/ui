@@ -1,8 +1,8 @@
 import { createFileRoute, notFound } from "@tanstack/react-router";
 
 import { ThemeDetail } from "@/components/site/themes/theme-detail";
-import { themeBySlug, themeItem } from "@/content/themes";
-import { SITE, registryUrl } from "@/content/site";
+import { themeBySlug } from "@/content/themes";
+import { SITE } from "@/content/site";
 import { ld, seo } from "@/lib/seo";
 
 export const Route = createFileRoute("/themes/$slug")({
@@ -14,7 +14,8 @@ export const Route = createFileRoute("/themes/$slug")({
   head: ({ loaderData: page }) => {
     if (!page) return {};
     const title = `${page.name} theme for shadcn/ui and Tailwind CSS`;
-    const description = `${page.summary} Light and dark mode, live preview, copy-ready CSS and a one-line shadcn install (${registryUrl(themeItem(page.slug)).replace("https://", "")}).`;
+    const extra = " Light and dark mode, live preview, copy-ready CSS and a one-line shadcn install.";
+    const description = (page.summary + extra).length <= 160 ? page.summary + extra : `${page.summary} Includes light and dark mode.`;
     const path = `/themes/${page.slug}`;
     return seo({
       title,

@@ -160,13 +160,15 @@ export function iconKeywords(words: string, setName: string) {
 }
 
 export function iconSeoTitle(title: string, setName: string) {
-  return `${title} Icon (${setName}): Free SVG & Animated React Icon`;
+  const full = `${title} Icon (${setName}): Free SVG & Animated React Icon`;
+  return full.length <= 60 ? full : `${title} Icon (${setName}): Free SVG & React Icon`.length <= 60 ? `${title} Icon (${setName}): Free SVG & React Icon` : `${title} Icon: Free SVG & React Icon`;
 }
 
 export function iconSeoDescription(title: string, setName: string, license: string, words: string) {
   const syn = relatedTerms(words, 3);
+  const base = `Free ${title.toLowerCase()} icon from ${setName} (${license}). Download the SVG or copy it as a static or animated React component.`;
   const also = syn.length ? ` Also known as ${syn.map((s) => `${s} icon`).join(", ")}.` : "";
-  return `Free ${title.toLowerCase()} icon from ${setName} (${license}). Download the SVG, copy it as a static or animated React component, or install it with the shadcn CLI.${also}`;
+  return (base + also).length <= 160 ? base + also : base;
 }
 
 /** High-intent icon searches that get their own indexable results page (/icons/search/<term>) and sitemap entry. */
