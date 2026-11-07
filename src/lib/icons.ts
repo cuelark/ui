@@ -1,4 +1,4 @@
-import { kebab, setSlug } from "./icon-slugs";
+import { setSlug } from "./icon-slugs";
 
 /** Icon data produced by scripts/icons.ts (all of react-icons, pre-rendered to SVG). */
 export type IconData = [attrs: string, inner: string];
@@ -24,7 +24,7 @@ export function iconWords(name: string, set: string) {
     .trim();
 }
 
-/** Human title for an icon page: "React", "Arrow Up Right". */
+/** Human title for an icon: "React", "Arrow Up Right". */
 export const iconTitle = (name: string, set: string) =>
   iconWords(name, set)
     .split(" ")
@@ -102,7 +102,7 @@ export function iconComponentSource(name: string, set: IconSetMeta | { id: strin
 
 /**
  * ${iconTitle(name, set.id)} from ${set.name}${"projectUrl" in set && set.projectUrl ? ` (${set.projectUrl})` : ""}${"license" in set && set.license ? `, ${set.license}` : ""}.
- * Via Cuelark UI: ui.cuelark.com/icons/${setSlug(set.id)}/${kebab(iconWords(name, set.id)) || kebab(name)}. Sized in em, colored by currentColor.
+ * Via Cuelark UI: ui.cuelark.com/icons/${setSlug(set.id)}. Sized in em, colored by currentColor.
  */
 export function ${comp}(props: React.SVGProps<SVGSVGElement>) {
   return (
@@ -200,7 +200,7 @@ import * as React from "react";
 
 /**
  * ${iconTitle(name, set.id)} from ${set.name}${"projectUrl" in set && set.projectUrl ? ` (${set.projectUrl})` : ""}${"license" in set && set.license ? `, ${set.license}` : ""}, animated ("${animation}").
- * Via Cuelark UI: ui.cuelark.com/icons/${setSlug(set.id)}/${kebab(iconWords(name, set.id)) || kebab(name)}. No dependencies: Web Animations API, skipped for prefers-reduced-motion.
+ * Via Cuelark UI: ui.cuelark.com/icons/${setSlug(set.id)}. No dependencies: Web Animations API, skipped for prefers-reduced-motion.
  */
 export interface ${comp}Handle {
   startAnimation: () => void;

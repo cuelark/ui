@@ -7,12 +7,11 @@ distributes are not, and keep their own terms.
 
 The icon library at [ui.cuelark.com/icons](https://ui.cuelark.com/icons) and the icon registry items
 (`/r/icons/<set>/<icon>.json`, `.svg`) are generated at build time from [react-icons](https://github.com/react-icons/react-icons)
-(MIT). Each icon set remains under its **original license**, shown with a link to the license and project on every set page,
-every icon page and in every installed icon component. Most sets are MIT, ISC or Apache-2.0. Note in particular:
+(MIT). Each icon set remains under its **original license**, shown with a link to the license and project on the hub,
+every set page and in every installed icon component. Most sets are MIT, ISC or Apache-2.0. Note in particular:
 
 - **Attribution required (CC BY):** Font Awesome 5 and 6 (CC BY 4.0), IcoMoon Free (CC BY 4.0), VS Code Codicons
-  (CC BY 4.0), Game Icons (CC BY 3.0). Credit the set when you ship its icons; each icon page offers a ready-made
-  attribution line.
+  (CC BY 4.0), Game Icons (CC BY 3.0). Credit the set when you ship its icons. The license and project are linked on the set page.
 - **Share-alike (CC BY-SA 3.0):** Typicons. Adaptations must be shared under the same license.
 - **Mozilla Public License 2.0:** Circum Icons. **SIL OFL 1.1:** Weather Icons. **CC0:** Simple Icons (brand marks may
   still be trademarks of their owners; follow each brand's guidelines).

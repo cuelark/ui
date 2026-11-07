@@ -1,4 +1,4 @@
-/** Long-tail keywords, titles and descriptions for icon pages. */
+/** Synonyms and keyword lists for icon search. Set-page titles live in icon-set-seo.ts. */
 
 /**
  * Concept groups: words people use interchangeably when looking for the same icon. Matching is bidirectional, so
@@ -157,18 +157,6 @@ export function iconKeywords(words: string, setName: string) {
     `${w} icon component`,
     ...syn.map((s) => `${s} icon`),
   ]);
-}
-
-export function iconSeoTitle(title: string, setName: string) {
-  const full = `${title} Icon (${setName}): Free SVG & Animated React Icon`;
-  return full.length <= 60 ? full : `${title} Icon (${setName}): Free SVG & React Icon`.length <= 60 ? `${title} Icon (${setName}): Free SVG & React Icon` : `${title} Icon: Free SVG & React Icon`;
-}
-
-export function iconSeoDescription(title: string, setName: string, license: string, words: string) {
-  const syn = relatedTerms(words, 3);
-  const base = `Free ${title.toLowerCase()} icon from ${setName} (${license}). Download the SVG or copy it as a static or animated React component.`;
-  const also = syn.length ? ` Also known as ${syn.map((s) => `${s} icon`).join(", ")}.` : "";
-  return (base + also).length <= 160 ? base + also : base;
 }
 
 /** High-intent icon searches that get their own indexable results page (/icons/search/<term>) and sitemap entry. */

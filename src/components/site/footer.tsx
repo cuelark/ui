@@ -55,8 +55,6 @@ const TOPICS: { label: string; to: string }[] = [
 
 export function SiteFooter() {
   const home = useRouterState({ select: (s) => s.location.pathname === "/" });
-  // The 51k icon pages link to their set and similar icons instead; listing every component there only adds weight.
-  const iconPage = useRouterState({ select: (s) => /^\/icons\/[^/]+\/[^/]+$/.test(s.location.pathname) });
   return (
     <footer className="cue-dash-t mt-24">
       <div className="mx-auto grid max-w-7xl gap-12 px-4 py-14 sm:px-6">
@@ -123,7 +121,7 @@ export function SiteFooter() {
           </nav>
         </div>
 
-        {!home && !iconPage && (
+        {!home && (
         <nav aria-label="All components" className="grid gap-8 border-t border-border pt-10 sm:grid-cols-2 lg:grid-cols-5">
           {GROUPS.map((g) => (
             <FooterColumn
