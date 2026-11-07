@@ -169,7 +169,7 @@ export const POPULAR_SEARCHES = [
   "bar-chart", "pie-chart", "trending-up", "database", "server", "cloud", "code", "terminal", "github", "git", "bug", "globe", "map", "location",
   "pin", "compass", "sun", "moon", "weather", "fire", "bolt", "battery", "wifi", "bluetooth", "power", "refresh", "sync", "filter", "sort", "grid",
   "list", "layout", "dashboard", "bookmark", "tag", "flag", "gift", "award", "trophy", "shield", "key", "info", "warning", "alert", "help",
-  "question", "logout", "login", "external-link", "cursor", "hand", "thumbs-up", "smile", "robot", "sparkles", "magic", "brain", "rocket",
+  "question", "logout", "login", "external-link", "cursor", "hand", "thumbs-up", "smile", "sparkles", "magic", "rocket",
   "car", "truck", "plane", "bike", "book", "graduation", "briefcase", "building", "store", "printer", "keyboard", "mouse", "laptop", "mobile",
   "tablet", "monitor", "headphones", "qr-code", "fingerprint", "notification", "inbox", "archive", "attachment", "paperclip", "scissors",
   "facebook", "twitter", "instagram", "linkedin", "youtube", "whatsapp", "discord", "slack", "google", "apple", "android", "windows",
