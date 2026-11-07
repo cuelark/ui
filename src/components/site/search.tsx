@@ -3,7 +3,7 @@ import { useNavigate } from "@tanstack/react-router";
 import { BookOpenIcon, ComponentIcon, SearchIcon } from "lucide-react";
 
 import { components, SECTIONS } from "@/content/components";
-import { DOC_PAGES } from "@/content/site";
+import { DOC_PAGES, SITE } from "@/content/site";
 import { CommandDialog, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/registry/cuelark/ui/command";
 
 /** ⌘K / Ctrl K site search over docs pages and every component (name, section and search keywords). */
@@ -39,7 +39,7 @@ export function Search() {
         <span className="flex-1 truncate text-left max-sm:sr-only">Search components…</span>
         <kbd className="cue-kbd max-sm:hidden">⌘K</kbd>
       </button>
-      <CommandDialog open={open} onOpenChange={setOpen} title="Search Cuelark UI" description="Jump to a component or docs page.">
+      <CommandDialog open={open} onOpenChange={setOpen} title={`Search ${SITE.name}`} description="Jump to a component or docs page.">
         <CommandInput placeholder={`Search ${components.length} components and docs…`} />
         <CommandList>
           <CommandEmpty>Nothing matches. Try “menu” or “animation”.</CommandEmpty>

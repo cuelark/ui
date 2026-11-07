@@ -5,7 +5,7 @@ export default function AlertDemo() {
     <div className="grid w-full max-w-lg gap-3">
       <Alert tone="info">
         <AlertTitle>New version available</AlertTitle>
-        <AlertDescription>Cuelark UI 1.1 adds motion tokens. Re-run the CLI to update.</AlertDescription>
+        <AlertDescription>Cuelark 1.1 adds motion tokens. Re-run the CLI to update.</AlertDescription>
       </Alert>
       <Alert tone="success" onDismiss={() => {}}>
         <AlertTitle>Domain verified</AlertTitle>

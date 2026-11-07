@@ -41,7 +41,7 @@ export function AgentPreview() {
           </ChainOfThought>
           <Tool name="fetch_pricing" icon={<GlobeIcon />} duration={0.6} input={{ seats: 12 }} output={{ plan: "Team", monthly: 240 }} />
           <p>
-            Team fits best: it covers up to 15 seats and adds SSO<InlineCitation index={1} source={{ title: "Pricing · Example", url: "https://example.com/pricing", excerpt: "Team: up to 15 seats, SSO included." }} />, at $240 a month.
+            Team fits best: it covers up to 15 seats and adds SSO<InlineCitation index={1} source={{ title: "Team plan pricing", url: "https://example.com/pricing", excerpt: "Team: up to 15 seats, SSO included." }} />, at $240 a month.
           </p>
           <MessageActions className="opacity-100">
             <MessageAction label="Copy"><CopyIcon /></MessageAction>

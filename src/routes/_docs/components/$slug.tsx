@@ -45,7 +45,7 @@ export const Route = createFileRoute("/_docs/components/$slug")({
       type: "article",
       keywords: doc.keywords,
       jsonLd: [
-        ld.sourceCode(`Cuelark UI ${doc.name}`, title, path, doc.keywords),
+        ld.sourceCode(`${SITE.name} ${doc.name}`, title, path, doc.keywords),
         ld.breadcrumbs([
           { name: SITE.name, path: "/" },
           { name: "Components", path: "/components" },

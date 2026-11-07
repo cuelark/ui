@@ -37,9 +37,11 @@ const absolute = (path: string) => `${SITE.url}${path === "/" ? "" : path}`;
 export function seo({ title, description: rawDescription, path, keywords, type = "website", jsonLd = [], noindex = false, image: imageUrl }: SeoInput) {
   const url = absolute(path);
   const description = fitDescription(rawDescription);
-  const suffixed = `${title} · ${SITE.name}`;
+  const suffix = ` · ${SITE.name}`;
+  const suffixed = `${title}${suffix}`;
   // Keep titles within ~60 characters: drop the brand suffix when it would push the title past that.
-  const fullTitle = title === SITE.title || suffixed.length > 60 ? title : suffixed;
+  // A title that already ends with the suffix (the homepage and the docs page) is used as written.
+  const fullTitle = title === SITE.title || title.endsWith(suffix) || suffixed.length > 60 ? title : suffixed;
   const image = imageUrl ?? OG_IMAGE;
   return {
     meta: [

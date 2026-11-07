@@ -38,7 +38,7 @@ export const Route = createFileRoute("/_docs/docs/installation")({
     }),
   head: () =>
     seo({
-      title: "Install Cuelark UI components with the shadcn CLI",
+      title: "Install UI components with the shadcn CLI",
       description: page.description,
       path: page.path,
       type: "article",
@@ -63,7 +63,7 @@ function Installation() {
       <div className="prose-cue">
         <h2 id="prerequisites">1. A shadcn/ui project</h2>
         <p>
-          Cuelark UI works in any React project set up for shadcn/ui with Tailwind CSS v4: Next.js, TanStack Start, React Router, Vite or Astro. If you are starting fresh, run{" "}
+          Cuelark works in any React project set up for shadcn/ui with Tailwind CSS v4: Next.js, TanStack Start, React Router, Vite or Astro. If you are starting fresh, run{" "}
           <code>npx shadcn@latest init</code> and follow the prompts.
         </p>
 

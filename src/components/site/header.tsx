@@ -66,7 +66,7 @@ export function SiteHeader() {
             <Search />
           </div>
           <Button variant="ghost" size="icon-sm" asChild>
-            <a href={SITE.github} aria-label="Cuelark UI on GitHub" rel="noopener">
+            <a href={SITE.github} aria-label={`${SITE.name} on GitHub`} rel="noopener">
               <GithubMark />
             </a>
           </Button>

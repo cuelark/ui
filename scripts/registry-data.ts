@@ -127,7 +127,7 @@ export function buildThemeCss() {
 }
 
 export function sitePaths() {
-  return ["/", "/components", "/agents", ...SCENARIOS.slice(1).map((s) => `/agents/${s.slug}`), "/themes", ...THEMES.map((t) => `/themes/${t.slug}`), "/icons", ...DOC_PAGES.map((p) => p.path), ...components.map((c) => `/components/${c.slug}`)];
+  return ["/", "/about", "/privacy", "/components", "/agents", ...SCENARIOS.slice(1).map((s) => `/agents/${s.slug}`), "/themes", ...THEMES.map((t) => `/themes/${t.slug}`), "/icons", ...DOC_PAGES.map((p) => p.path), ...components.map((c) => `/components/${c.slug}`)];
 }
 
 const urlset = (paths: string[], lastmod: string) =>

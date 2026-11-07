@@ -33,10 +33,10 @@ const MotionDial = lazy(() => import("@/components/site/motion-dial").then((m) =
 
 const FAQ = [
   {
-    q: "What is Cuelark UI?",
+    q: "What is Cuelark?",
     a: `An open-source library of ${components.length} React components for shadcn/ui: a precise, monochrome core with tactile details and GSAP motion. You install the source with the shadcn CLI and own every line.`,
   },
-  { q: "Is it free for commercial projects?", a: "Yes. Cuelark UI is MIT licensed. GSAP, which powers the animation, is free for commercial use under its standard license." },
+  { q: "Is it free for commercial projects?", a: "Yes. Cuelark is MIT licensed. GSAP, which powers the animation, is free for commercial use under its standard license." },
   {
     q: "How is it different from shadcn/ui?",
     a: "Same registry, same conventions, same CLI, so it sits next to your shadcn components. On top you get a refined visual language, GSAP motion with one intensity knob, a full theme editor and components shadcn does not ship: Dock, Number Ticker, Text Reveal, Stepper, Rating, Marquee and more.",
@@ -331,7 +331,7 @@ function Bento() {
           </InputOTP>
         </Tile>
         <Tile title="Rating" slug="rating" text="Stars that pop up to your score in a cascade." className="md:col-span-2">
-          <Rating defaultValue={4} size="lg" label="Rate Cuelark UI" />
+          <Rating defaultValue={4} size="lg" label="Rate Cuelark" />
         </Tile>
         <Tile title="Dock" slug="dock" text="Icons that swell as you approach, like the macOS Dock." className="md:col-span-2">
           <div className="origin-bottom scale-90">

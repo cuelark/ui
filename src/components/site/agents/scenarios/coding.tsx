@@ -230,7 +230,7 @@ export function CodingScenario() {
   return (
     <AgentWindow
       name="billing-agent"
-      context="acme/billing"
+      context="cuelark/billing"
       script={s}
       thread={thread}
       panel={panel}

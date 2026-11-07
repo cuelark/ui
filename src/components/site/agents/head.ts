@@ -28,7 +28,7 @@ export function agentsHead(scenario: Scenario) {
   const title = index ? "AI agent UI components for React and shadcn/ui" : `${scenario.title}: a live React example`;
   const description = index
     ? `${agents.length} open-source components for AI chat and agents, shown in live coding, research and data agents: prompt input, reasoning, tool calls, plans with approval, diffs, citations, artifacts and traces. Built for shadcn/ui and the Vercel AI SDK.`
-    : `${scenario.description} Built from open-source Cuelark UI components for React and shadcn/ui.`;
+    : `${scenario.description} Built from open-source UI components for React and shadcn/ui.`;
   const shot = SHOTS[`scenario:${scenario.slug}`];
   const used = scenario.components.map((slug) => components.find((c) => c.slug === slug)).filter((c) => !!c);
   return seo({

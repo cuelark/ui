@@ -175,7 +175,7 @@ function Anatomy() {
                 {shot && (
                   <figure className="grid content-start gap-2">
                     <div className="overflow-hidden rounded-xl border border-border bg-background">
-                      <ShotImage shot={shot} alt={`${z.name} of an agent app built with Cuelark UI: ${z.items.map((it) => componentName(it.slug)).join(", ")}`} />
+                      <ShotImage shot={shot} alt={`${z.name} of an agent app built with Cuelark: ${z.items.map((it) => componentName(it.slug)).join(", ")}`} />
                     </div>
                     <figcaption className="text-xs text-muted-foreground">From the live demo above.</figcaption>
                   </figure>

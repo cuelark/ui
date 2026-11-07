@@ -14,10 +14,10 @@ const countOf = (count: number) => count.toLocaleString("en-US");
 
 /**
  * The `<title>` `seo()` will emit. The brand suffix is kept only when the whole title stays under 60 characters.
- * Mirrors `emittedTitle` behavior in src/lib/seo.ts (` · Cuelark UI`).
+ * Mirrors the suffix rule in src/lib/seo.ts.
  */
 export function titleUnder60(title: string) {
-  const suffixed = `${title} · Cuelark UI`;
+  const suffixed = `${title} · Cuelark`;
   const full = suffixed.length > 60 ? title : suffixed;
   if (full.length >= 60) throw new Error(`Title is ${full.length} characters: ${full}`);
   return full;
