@@ -27,8 +27,9 @@ export default defineConfig({
         retryCount: 3,
         retryDelay: 500,
         concurrency: 16,
-        // Real site routes only (never links inside code samples). The hub, each icon set and the popular searches
-        // are static. Per-icon URLs are not pages: the Worker 301s them (see src/worker.ts).
+        // Real site routes only (never links inside code samples). The hub, each icon set and the icon searches
+        // are static. Search pages are noindex and are not in the sitemap. Per-icon URLs are not pages: the Worker
+        // 301s them (see src/worker.ts).
         filter: ({ path }) =>
           path === "/" ||
           path === "/about" ||

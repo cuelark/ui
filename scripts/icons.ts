@@ -13,6 +13,7 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { createRequire } from "node:module";
 import { join } from "node:path";
 
+import { classifyRenderedIcon, finalizeDrawing } from "../src/lib/icon-set-facts.ts";
 import { iconWords } from "../src/lib/icons.ts";
 import { kebab } from "../src/lib/icon-slugs.ts";
 
@@ -22,7 +23,7 @@ const { version } = JSON.parse(readFileSync(join(import.meta.dirname, "..", "nod
 const { IconsManifest } = require("react-icons/lib") as { IconsManifest: { id: string; name: string; projectUrl: string; license: string; licenseUrl: string }[] };
 
 const stamp = join(OUT, ".version");
-const BUILD = `${version}+slugs1`;
+const BUILD = `${version}+drawing1`;
 if (existsSync(stamp) && readFileSync(stamp, "utf8") === BUILD && !process.argv.includes("--force")) {
   console.log(`[icons] react-icons ${version} already built`);
   process.exit(0);
@@ -33,7 +34,7 @@ mkdirSync(OUT, { recursive: true });
 const COMMON = [/\s?stroke="currentColor"/, /\s?fill="currentColor"/, /\s?height="1em"/, /\s?width="1em"/, /\s?xmlns="http:\/\/www\.w3\.org\/2000\/svg"/, /\s?stroke-width="0"/];
 
 const index: {
-  sets: { id: string; name: string; count: number; license: string; licenseUrl: string; projectUrl: string }[];
+  sets: { id: string; name: string; count: number; license: string; licenseUrl: string; projectUrl: string; drawing: ReturnType<typeof finalizeDrawing> }[];
   names: Record<string, string[]>;
   /** URL slug per icon, aligned with names: "arrow-right" (unique within its set). */
   slugs: Record<string, string[]>;
@@ -43,11 +44,22 @@ let total = 0;
 for (const set of IconsManifest) {
   const mod = (await import(`react-icons/${set.id}`)) as Record<string, ComponentType>;
   const icons: Record<string, [string, string]> = {};
+  let stroke = 0;
+  let fill = 0;
+  let duotone = 0;
+  let colored = 0;
+  const variantHits: Record<string, number> = {};
   for (const [name, Icon] of Object.entries(mod)) {
     if (typeof Icon !== "function") continue;
     const svg = renderToStaticMarkup(createElement(Icon));
     const open = svg.slice(0, svg.indexOf(">") + 1);
     const inner = svg.slice(open.length, -"</svg>".length);
+    const measured = classifyRenderedIcon(name, set.id, svg);
+    if (measured.paint === "stroke") stroke++;
+    else fill++;
+    if (measured.duotone) duotone++;
+    if (measured.colored) colored++;
+    for (const token of measured.variants) variantHits[token] = (variantHits[token] ?? 0) + 1;
     // Keep only what differs from the shared defaults (viewBox, fill="none", stroke widths, …).
     let attrs = open.slice(4, -1);
     const hadStrokeWidth0 = /stroke-width="0"/.test(attrs);
@@ -56,8 +68,10 @@ for (const set of IconsManifest) {
     icons[name] = [hadStrokeWidth0 ? attrs : `${attrs} data-sw="1"`.trim(), inner];
   }
   const names = Object.keys(icons);
+  const drawing = finalizeDrawing({ stroke, fill, duotone, colored, variantHits, total: names.length });
   writeFileSync(join(OUT, `${set.id}.json`), JSON.stringify({ id: set.id, name: set.name, icons }));
-  index.sets.push({ id: set.id, name: set.name, count: names.length, license: set.license, licenseUrl: set.licenseUrl, projectUrl: set.projectUrl });
+  index.sets.push({ id: set.id, name: set.name, count: names.length, license: set.license, licenseUrl: set.licenseUrl, projectUrl: set.projectUrl, drawing });
+  console.log(`[icons] ${set.id} stroke=${drawing.stroke} fill=${drawing.fill} duotone=${drawing.duotone} colored=${drawing.colored} variants=${JSON.stringify(drawing.variants)}`);
   index.names[set.id] = names;
   const seen = new Map<string, number>();
   index.slugs[set.id] = names.map((n) => {

@@ -1,8 +1,9 @@
 import { createServerFn } from "@tanstack/react-start";
 
-import { expandQuery } from "./icon-seo";
+import { describeSet, exampleIconName, previewIndexes, setUsageSource, whenToPick } from "./icon-set-facts";
+import { iconQueryParts, rankIconWords } from "./icon-seo";
 import { setIdFromSlug, setSlug } from "./icon-slugs";
-import { iconWords, type IconIndex, type IconSet, type IconSetMeta } from "./icons";
+import { iconTitle, iconWords, type IconIndex, type IconSet, type IconSetMeta } from "./icons";
 
 /** Accepts a readable slug ("lucide") or a react-icons id ("lu"), so old links keep working. */
 function resolveSet(index: IconIndex, param: string): IconSetMeta | undefined {
@@ -10,7 +11,7 @@ function resolveSet(index: IconIndex, param: string): IconSetMeta | undefined {
   return index.sets.find((s) => s.id === id);
 }
 
-/** Set metadata for /icons/<set>. Icon SVGs load in the browser from /icons/<id>.json. */
+/** Set metadata, a server-rendered sample, and the install example for /icons/<set>. */
 export const getIconSet = createServerFn({ method: "GET" })
   .validator((d: { set: string }) => ({ set: String(d.set ?? "").slice(0, 80) }))
   .handler(async ({ data }) => {
@@ -18,7 +19,26 @@ export const getIconSet = createServerFn({ method: "GET" })
     const index = await readIconAsset<IconIndex>("/icons/index.json");
     const meta = resolveSet(index, data.set);
     if (!meta) return null;
-    return { meta, setSlug: setSlug(meta.id) };
+    const names = index.names[meta.id] ?? [];
+    const slugs = index.slugs[meta.id] ?? [];
+    const file = await readIconAsset<IconSet>(`/icons/${meta.id}.json`);
+    const order = names.map((name, i) => ({ name, slug: slugs[i] ?? "", title: iconTitle(name, meta.id) }));
+    order.sort((a, b) => a.title.localeCompare(b.title, "en"));
+    const preview = previewIndexes(order.length).flatMap((i) => {
+      const item = order[i];
+      const icon = item ? file.icons[item.name] : undefined;
+      return item && icon ? [{ name: item.name, slug: item.slug, data: icon }] : [];
+    });
+    const example = exampleIconName(names, meta.id);
+    return {
+      meta,
+      setSlug: setSlug(meta.id),
+      preview,
+      about: describeSet(meta),
+      choice: whenToPick(meta, index.sets),
+      install: "npm install react-icons",
+      usage: example ? setUsageSource(meta.id, example) : "",
+    };
   });
 
 /** Every set's metadata (no icon data), for the icons hub. */
@@ -30,7 +50,7 @@ export const getIconSets = createServerFn({ method: "GET" }).handler(async () =>
 
 export const SEARCH_PAGE = 240;
 
-/** Server-side icon search for the indexable /icons/search/<term> pages. Ranks whole-word matches first. */
+/** Server-side icon search for /icons/search/<term>. Matches whole tokens in the name, including synonym tokens. */
 export const searchIcons = createServerFn({ method: "GET" })
   // Bound the work per request: short queries, a few terms, a sane page number.
   .validator((d: { q: string; page: number; set?: string }) => ({
@@ -41,24 +61,20 @@ export const searchIcons = createServerFn({ method: "GET" })
   .handler(async ({ data }) => {
     const { readIconAsset } = await import("./icons-asset.server");
     const index = await readIconAsset<IconIndex>("/icons/index.json");
-    const terms = data.q.toLowerCase().split(/\s+/).filter(Boolean).slice(0, 6);
-    // Each query word may also match its synonyms ("agent" → bot, robot, ai…), as whole words.
-    const groups = expandQuery(data.q);
+    const parts = iconQueryParts(data.q);
+    const terms = parts.terms.slice(0, 6);
+    const groups = parts.groups.slice(0, 6);
     const onlySet = data.set ? resolveSet(index, data.set)?.id : undefined;
     const hits: { setId: string; at: number; score: number }[] = [];
     const perSet: Record<string, number> = {};
     for (const s of index.sets) {
       const names = index.names[s.id]!;
       for (let at = 0; at < names.length; at++) {
-        const words = iconWords(names[at]!, s.id);
-        const list = words.split(" ");
-        const direct = terms.every((t) => words.includes(t));
-        if (!direct && !groups.every((g) => g.some((t) => list.includes(t)))) continue;
+        const score = rankIconWords(iconWords(names[at]!, s.id), terms, groups);
+        if (score === null) continue;
         perSet[s.id] = (perSet[s.id] ?? 0) + 1;
         if (onlySet && s.id !== onlySet) continue;
-        // Exact name, then whole-word name match, then partial, then synonym-only matches.
-        const exact = words === terms.join(" ") ? 0 : terms.every((t) => list.includes(t)) ? 1 : direct ? 2 : 3;
-        hits.push({ setId: s.id, at, score: exact * 1000 + list.length });
+        hits.push({ setId: s.id, at, score });
       }
     }
     hits.sort((a, b) => a.score - b.score);

@@ -27,9 +27,8 @@ export const Route = createFileRoute("/icons/search/$query")({
       description: `Browse ${total.toLocaleString()} free ${q} icons from Lucide, Heroicons, Font Awesome, Phosphor and more. Download the SVG or copy a React component in one click.`,
       // Filtered (?set=) and paged variants all canonicalize to the main results page.
       path,
-      // Only the prerendered popular searches are indexed; any other term is rendered on request (and robots.txt
-      // keeps crawlers off it), so it stays out of the index too.
-      noindex: total === 0 || !POPULAR_SEARCHES.includes(kebab(q) || params.query),
+      // Templated search results stay out of the index. Crawlers can still follow links to the set pages.
+      noindex: true,
       keywords: [...relatedTerms(q, 6).map((t) => `${t} icon`), `${q} icon`, `${q} icons`, `${q} icon svg`, `${q} icon react`, `free ${q} icons`, `${q} icon png svg`, `animated ${q} icon`, `${q} icon tailwind`, `${q} icon shadcn`, `${q} vector icon`],
       jsonLd: [
         ld.breadcrumbs([

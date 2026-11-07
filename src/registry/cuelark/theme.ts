@@ -10,7 +10,7 @@
  *   --cl-marks                      crop-mark visibility (0 hides every cue mark)
  *   --cl-motion                     GSAP motion amplitude (0 off · 1 · 1.5 expressive), see lib/motion.ts
  */
-import { DEFAULT_THEME, themeTokens, themeVars } from "../../lib/site-theme";
+import { DEFAULT_THEME, themeTokens, themeVars } from "../../lib/site-theme.ts";
 
 export type CssVars = Record<string, string>;
 

@@ -3,7 +3,7 @@ import { test } from "node:test";
 
 import { createRequire } from "node:module";
 
-import { expandQuery, iconKeywords, POPULAR_SEARCHES, relatedTerms, termFromSlug } from "../src/lib/icon-seo.ts";
+import { expandQuery, iconKeywords, iconQueryParts, POPULAR_SEARCHES, rankIconWords, relatedTerms, termFromSlug } from "../src/lib/icon-seo.ts";
 import { iconRedirect } from "../src/lib/icon-redirect.ts";
 import { HUB_DESCRIPTION, HUB_TITLE, licenseLabel, setPageCopy, titleUnder60 } from "../src/lib/icon-set-seo.ts";
 import { kebab, setIdFromSlug, setSlug } from "../src/lib/icon-slugs.ts";
@@ -29,6 +29,24 @@ test("icon keywords include long-tail and synonym phrases", () => {
 
 test("popular searches are listed once", () => {
   assert.equal(new Set(POPULAR_SEARCHES).size, POPULAR_SEARCHES.length);
+});
+
+test("icon search matches whole tokens, not substrings", () => {
+  const { terms, groups } = iconQueryParts("ai");
+  const rank = (words: string) => rankIconWords(words, terms, groups);
+  for (const words of ["chair", "mail", "stairs", "train", "email", "detail"]) assert.equal(rank(words), null, words);
+  const exact = rank("ai");
+  const named = rank("open ai");
+  const synonym = rank("robot");
+  assert.ok(exact !== null && named !== null && synonym !== null);
+  assert.ok(exact < named && named < synonym);
+  const arrow = iconQueryParts("arrow-right");
+  const exactArrow = rankIconWords("arrow right", arrow.terms, arrow.groups);
+  const longerArrow = rankIconWords("arrow right circle", arrow.terms, arrow.groups);
+  assert.ok(exactArrow !== null && longerArrow !== null && exactArrow < longerArrow);
+  assert.equal(rankIconWords("arrow", arrow.terms, arrow.groups), null);
+  assert.equal(rankIconWords("arrows", arrow.terms, arrow.groups), null);
+  assert.equal(rankIconWords("narrow", arrow.terms, arrow.groups), null);
 });
 
 test("slugs are readable and reversible", () => {

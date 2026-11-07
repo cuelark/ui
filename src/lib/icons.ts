@@ -1,8 +1,29 @@
-import { setSlug } from "./icon-slugs";
+import { setSlug } from "./icon-slugs.ts";
 
 /** Icon data produced by scripts/icons.ts (all of react-icons, pre-rendered to SVG). */
 export type IconData = [attrs: string, inner: string];
-export type IconSetMeta = { id: string; name: string; count: number; license: string; licenseUrl: string; projectUrl: string };
+/** Measured from the rendered SVG and the icon name. Absent on an index built before this was recorded. */
+export type IconDrawing = {
+  /** Root SVG uses a stroke (fill="none" or a non-zero stroke width). */
+  stroke: number;
+  /** Root SVG is a filled shape. */
+  fill: number;
+  /** Name starts or ends with duotone or twotone. */
+  duotone: number;
+  /** A path uses a fixed color instead of currentColor. */
+  colored: number;
+  /** Style words that are the first or last name token and cover a real share of the set. */
+  variants: Record<string, number>;
+};
+export type IconSetMeta = {
+  id: string;
+  name: string;
+  count: number;
+  license: string;
+  licenseUrl: string;
+  projectUrl: string;
+  drawing?: IconDrawing;
+};
 export type IconIndex = { sets: IconSetMeta[]; names: Record<string, string[]>; slugs: Record<string, string[]> };
 export type IconSet = { id: string; name: string; icons: Record<string, IconData> };
 

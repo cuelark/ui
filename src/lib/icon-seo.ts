@@ -159,7 +159,38 @@ export function iconKeywords(words: string, setName: string) {
   ]);
 }
 
-/** High-intent icon searches that get their own indexable results page (/icons/search/<term>) and sitemap entry. */
+/** For a query, each word plus its single-word synonyms. Matching is whole tokens, never a substring of a longer word. */
+export function iconQueryParts(q: string) {
+  const query = q
+    .toLowerCase()
+    .replace(/[-_]+/g, " ")
+    .replace(/[^a-z0-9\s]+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+  const terms = query.split(" ").filter(Boolean);
+  return { terms, groups: expandQuery(query) };
+}
+
+/**
+ * Rank of an icon whose name words are `nameWords`, or null when it does not match.
+ * "ai" matches a token "ai" (and synonym tokens such as "robot"). It does not match "chair", "mail", or "stairs".
+ * Lower scores rank first: exact name, then every query word as its own token, then synonym-only matches.
+ */
+export function rankIconWords(nameWords: string, terms: string[], groups: string[][]): number | null {
+  if (!terms.length) return null;
+  const tokens = nameWords.toLowerCase().split(/[^a-z0-9]+/).filter(Boolean);
+  const tokenSet = new Set(tokens);
+  const hit = (term: string) => {
+    const parts = term.toLowerCase().split(/[^a-z0-9]+/).filter(Boolean);
+    return parts.length > 0 && parts.every((part) => tokenSet.has(part));
+  };
+  if (!groups.every((group) => group.some(hit))) return null;
+  const direct = terms.every((term) => tokenSet.has(term));
+  const exact = tokens.join(" ") === terms.join(" ") ? 0 : direct ? 1 : 2;
+  return exact * 1000 + tokens.length;
+}
+
+/** Search terms with a prerendered results page. The pages stay available, with a noindex meta tag, and are not in the sitemap. */
 export const POPULAR_SEARCHES = [
   "agent", "ai", "assistant", "bot", "robot", "chatbot", "automation", "brain", "idea", "workflow", "api", "plugin", "integration",
   "arrow", "arrow-right", "arrow-left", "arrow-up", "arrow-down", "chevron", "chevron-down", "chevron-right", "home", "user", "users", "settings",

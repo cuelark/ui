@@ -2,7 +2,7 @@
  * The theme gallery: one indexable page per preset (/themes/<slug>), with copy-ready CSS and a shadcn install
  * command. Plain data so the sitemap, llms.txt and the registry builder can share it.
  */
-import { PRESETS, presetSlug, type SiteTheme } from "../lib/site-theme";
+import { PRESETS, presetSlug, type SiteTheme } from "../lib/site-theme.ts";
 
 export type ThemePage = {
   slug: string;

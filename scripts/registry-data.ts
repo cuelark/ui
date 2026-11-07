@@ -4,7 +4,6 @@
  */
 import { existsSync, readFileSync } from "node:fs";
 import { setSlug } from "../src/lib/icon-slugs.ts";
-import { POPULAR_SEARCHES } from "../src/lib/icon-seo.ts";
 import { join } from "node:path";
 import { components } from "../src/content/components.ts";
 import { SCENARIOS, ZONES } from "../src/content/agent-guide.ts";
@@ -134,16 +133,15 @@ const urlset = (paths: string[], lastmod: string) =>
   `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${paths.map((p) => `  <url><loc>${SITE.url}${p === "/" ? "" : p}</loc><lastmod>${lastmod}</lastmod></url>`).join("\n")}\n</urlset>\n`;
 
 /**
- * Sitemaps: /sitemap.xml is an index. Page URLs live in sitemap-pages.xml: the docs, the icon hub, one URL per icon
- * set and the popular icon searches. Per-icon URLs are not listed; those paths 301 to the set page.
- * Set names come from public/icons/index.json (icons:build).
+ * Sitemaps: /sitemap.xml is an index. Page URLs live in sitemap-pages.xml: the docs, the icon hub and one URL per
+ * icon set. Icon search pages are noindex and are not listed. Per-icon URLs are not listed; those paths 301 to the
+ * set page. Set names come from public/icons/index.json (icons:build).
  */
 export function buildSitemaps(lastmod: string): Record<string, string> {
   const iconIndexPath = join(ROOT, "public", "icons", "index.json");
   const icons = existsSync(iconIndexPath) ? (JSON.parse(readFileSync(iconIndexPath, "utf8")) as { sets: { id: string }[] }) : { sets: [] };
-  const searches = [...new Set(POPULAR_SEARCHES)].map((t) => `/icons/search/${t}`);
   const files: Record<string, string> = {
-    "public/sitemap-pages.xml": urlset([...sitePaths(), ...icons.sets.map((s) => `/icons/${setSlug(s.id)}`), ...searches], lastmod),
+    "public/sitemap-pages.xml": urlset([...sitePaths(), ...icons.sets.map((s) => `/icons/${setSlug(s.id)}`)], lastmod),
   };
   const entries = Object.keys(files).map((f) => `  <sitemap><loc>${SITE.url}/${f.replace("public/", "")}</loc><lastmod>${lastmod}</lastmod></sitemap>`);
   files["public/sitemap.xml"] = `<?xml version="1.0" encoding="UTF-8"?>\n<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${entries.join("\n")}\n</sitemapindex>\n`;
@@ -152,17 +150,15 @@ export function buildSitemaps(lastmod: string): Record<string, string> {
 
 /**
  * robots.txt: pages are open to crawlers, including retired per-icon URLs so they can see the 301 to the set page.
- * Arbitrary icon searches still run code per request and are not pages (the popular ones are prerendered and allowed).
- * Per-icon registry files, server functions and standalone previews stay disallowed.
+ * Icon search pages are crawlable so the noindex meta tag can be seen. Per-icon registry files, server functions
+ * and standalone previews stay disallowed.
  */
 export function buildRobots() {
   return [
     "# /icons/<set>/<icon> permanently redirects to /icons/<set>. Leave those paths allowed so crawlers fetch the 301.",
-    "# Only the popular /icons/search/<term> URLs below are pages. Any other /icons/search/ URL is disallowed.",
+    "# /icons/search/<term> is a results page with a noindex meta tag. Leave it allowed.",
     "User-agent: *",
     "Allow: /",
-    ...[...new Set(POPULAR_SEARCHES)].map((t) => `Allow: /icons/search/${t}$`),
-    "Disallow: /icons/search/",
     "Disallow: /r/icons/",
     "Disallow: /_serverFn/",
     "Disallow: /preview/",
@@ -211,7 +207,7 @@ ${ZONES.map((z) => `### ${z.name}\n\n${z.summary}\n\n${z.items.map((it) => `- ${
 
 ## Icons
 
-One page per icon set, plus the hub at ${SITE.url}/icons. Search and copy SVG or JSX on the page. There is no page per icon: /icons/<set>/<icon> redirects to the set. Popular terms also have a results page at ${SITE.url}/icons/search/<term>.
+One page per icon set, plus the hub at ${SITE.url}/icons. Search and copy SVG or JSX on the page. There is no page per icon: /icons/<set>/<icon> redirects to the set. Term search is at ${SITE.url}/icons/search/<term> and is not listed in the sitemap.
 
 ${iconLines()}
 
