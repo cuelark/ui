@@ -23,7 +23,6 @@ import { Route as DocsDocsIndexRouteImport } from './routes/_docs/docs/index'
 import { Route as DocsDocsInstallationRouteImport } from './routes/_docs/docs/installation'
 import { Route as DocsDocsThemingRouteImport } from './routes/_docs/docs/theming'
 import { Route as IconsSetIndexRouteImport } from './routes/icons/$set/index'
-import { Route as IconsSetIconRouteImport } from './routes/icons/$set/$icon'
 import { Route as IconsSearchQueryRouteImport } from './routes/icons/search/$query'
 import { Route as RIconsSetFileRouteImport } from './routes/r/icons/$set/$file'
 
@@ -96,11 +95,6 @@ const IconsSetIndexRoute = IconsSetIndexRouteImport.update({
   path: '/icons/$set/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const IconsSetIconRoute = IconsSetIconRouteImport.update({
-  id: '/icons/$set/$icon',
-  path: '/icons/$set/$icon',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const IconsSearchQueryRoute = IconsSearchQueryRouteImport.update({
   id: '/icons/search/$query',
   path: '/icons/search/$query',
@@ -123,7 +117,6 @@ export interface FileRoutesByFullPath {
   '/components/$slug': typeof DocsComponentsSlugRoute
   '/docs/installation': typeof DocsDocsInstallationRoute
   '/docs/theming': typeof DocsDocsThemingRoute
-  '/icons/$set/$icon': typeof IconsSetIconRoute
   '/icons/search/$query': typeof IconsSearchQueryRoute
   '/components/': typeof DocsComponentsIndexRoute
   '/docs/': typeof DocsDocsIndexRoute
@@ -141,7 +134,6 @@ export interface FileRoutesByTo {
   '/components/$slug': typeof DocsComponentsSlugRoute
   '/docs/installation': typeof DocsDocsInstallationRoute
   '/docs/theming': typeof DocsDocsThemingRoute
-  '/icons/$set/$icon': typeof IconsSetIconRoute
   '/icons/search/$query': typeof IconsSearchQueryRoute
   '/components': typeof DocsComponentsIndexRoute
   '/docs': typeof DocsDocsIndexRoute
@@ -161,7 +153,6 @@ export interface FileRoutesById {
   '/_docs/components/$slug': typeof DocsComponentsSlugRoute
   '/_docs/docs/installation': typeof DocsDocsInstallationRoute
   '/_docs/docs/theming': typeof DocsDocsThemingRoute
-  '/icons/$set/$icon': typeof IconsSetIconRoute
   '/icons/search/$query': typeof IconsSearchQueryRoute
   '/_docs/components/': typeof DocsComponentsIndexRoute
   '/_docs/docs/': typeof DocsDocsIndexRoute
@@ -181,7 +172,6 @@ export interface FileRouteTypes {
     | '/components/$slug'
     | '/docs/installation'
     | '/docs/theming'
-    | '/icons/$set/$icon'
     | '/icons/search/$query'
     | '/components/'
     | '/docs/'
@@ -199,7 +189,6 @@ export interface FileRouteTypes {
     | '/components/$slug'
     | '/docs/installation'
     | '/docs/theming'
-    | '/icons/$set/$icon'
     | '/icons/search/$query'
     | '/components'
     | '/docs'
@@ -218,7 +207,6 @@ export interface FileRouteTypes {
     | '/_docs/components/$slug'
     | '/_docs/docs/installation'
     | '/_docs/docs/theming'
-    | '/icons/$set/$icon'
     | '/icons/search/$query'
     | '/_docs/components/'
     | '/_docs/docs/'
@@ -235,7 +223,6 @@ export interface RootRouteChildren {
   AgentsIndexRoute: typeof AgentsIndexRoute
   IconsIndexRoute: typeof IconsIndexRoute
   ThemesIndexRoute: typeof ThemesIndexRoute
-  IconsSetIconRoute: typeof IconsSetIconRoute
   IconsSearchQueryRoute: typeof IconsSearchQueryRoute
   IconsSetIndexRoute: typeof IconsSetIndexRoute
   RIconsSetFileRoute: typeof RIconsSetFileRoute
@@ -341,13 +328,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IconsSetIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/icons/$set/$icon': {
-      id: '/icons/$set/$icon'
-      path: '/icons/$set/$icon'
-      fullPath: '/icons/$set/$icon'
-      preLoaderRoute: typeof IconsSetIconRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/icons/search/$query': {
       id: '/icons/search/$query'
       path: '/icons/search/$query'
@@ -392,7 +372,6 @@ const rootRouteChildren: RootRouteChildren = {
   AgentsIndexRoute: AgentsIndexRoute,
   IconsIndexRoute: IconsIndexRoute,
   ThemesIndexRoute: ThemesIndexRoute,
-  IconsSetIconRoute: IconsSetIconRoute,
   IconsSearchQueryRoute: IconsSearchQueryRoute,
   IconsSetIndexRoute: IconsSetIndexRoute,
   RIconsSetFileRoute: RIconsSetFileRoute,

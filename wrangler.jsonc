@@ -1,4 +1,6 @@
 // Local development only (`pnpm dev` via @cloudflare/vite-plugin). Deployed stages live in alchemy.run.ts.
+// No icon routes here. src/worker.ts returns the 301s for retired /icons/<set>/<icon> URLs. The production routes
+// that used to claim /icons/<set>/* belong to the icon Workers; remove them with `pnpm retire:icons --confirm-production`.
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "cuelark-ui-local",

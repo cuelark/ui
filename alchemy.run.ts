@@ -5,6 +5,8 @@
  *   pnpm deploy:prod --confirm-production    → stage `prod` (ui.cuelark.com)
  *
  * Prerendered pages and /r/*.json registry files are static assets; the Worker only answers what is left.
+ * /icons/<set>/<icon> 301s to the set page from src/worker.ts. In production that reaches this Worker only after
+ * the old icon Workers are destroyed (`pnpm retire:icons --confirm-production`): their routes own /icons/<set>/*.
  */
 import * as Alchemy from "alchemy";
 import * as Cloudflare from "alchemy/Cloudflare";

@@ -1,3 +1,5 @@
+# /icons/<set>/<icon> permanently redirects to /icons/<set>. Leave those paths allowed so crawlers fetch the 301.
+# Only the popular /icons/search/<term> URLs below are pages. Any other /icons/search/ URL is disallowed.
 User-agent: *
 Allow: /
 Allow: /icons/search/agent$
@@ -124,10 +126,8 @@ Allow: /icons/search/cursor$
 Allow: /icons/search/hand$
 Allow: /icons/search/thumbs-up$
 Allow: /icons/search/smile$
-Allow: /icons/search/robot$
 Allow: /icons/search/sparkles$
 Allow: /icons/search/magic$
-Allow: /icons/search/brain$
 Allow: /icons/search/rocket$
 Allow: /icons/search/car$
 Allow: /icons/search/truck$

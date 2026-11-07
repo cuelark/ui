@@ -1,10 +1,10 @@
 import { ArrowUpRightIcon } from "lucide-react";
 
+import { licenseLabel } from "@/lib/icon-set-seo";
 import type { IconSetMeta } from "@/lib/icons";
 import { cn } from "@/lib/utils";
 
-/** "MIT" → "MIT license"; "MPL-2.0 license" stays as is. */
-export const licenseLabel = (license: string) => (/licen[sc]e/i.test(license) ? license.replace(/ license$/i, " license").replace(/ License$/, " license") : `${license} license`);
+export { licenseLabel };
 
 const host = (url: string) => {
   try {
@@ -16,7 +16,7 @@ const host = (url: string) => {
 
 /**
  * Where an icon set comes from and how it may be used: its license and its project, linked to the original sources,
- * the way react-icons credits every set. Shown on set pages, icon pages and in the explorer.
+ * the way react-icons credits every set. Shown on the hub, on each set page and in the explorer.
  */
 export function IconLicense({ set, className, compact = false }: { set: Pick<IconSetMeta, "license" | "licenseUrl" | "projectUrl" | "name">; className?: string; compact?: boolean }) {
   const link = "inline-flex items-center gap-1 font-medium text-foreground underline decoration-border underline-offset-4 transition-colors hover:decoration-foreground";

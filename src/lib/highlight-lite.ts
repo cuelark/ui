@@ -1,5 +1,5 @@
 /**
- * A tiny syntax highlighter for the short, predictable snippets on icon pages (TSX components, SVG markup, shell
+ * A tiny syntax highlighter for short, predictable snippets (TSX components, SVG markup, shell
  * commands). It runs the same on the server and in the browser, so pages ship only the raw code instead of
  * highlighted HTML plus a second copy of it for hydration. Colors come from the .hl-* rules in globals.css.
  */

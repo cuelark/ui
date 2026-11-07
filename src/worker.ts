@@ -1,7 +1,9 @@
 import serverEntry from "@tanstack/react-start/server-entry";
 
-/** Long-lived, data-only pages: one icon page or icon registry file never changes between deploys. */
-const EDGE_CACHED = /^\/(icons\/[a-z0-9-]+\/[a-z0-9-]+|r\/icons\/[a-z0-9-]+\/[a-zA-Z0-9-]+\.(json|svg))$/;
+import { iconRedirect } from "./lib/icon-redirect";
+
+/** Registry files for one icon never change between deploys. Per-icon HTML is a 301, so it is not cached here. */
+const EDGE_CACHED = /^\/r\/icons\/[a-z0-9-]+\/[a-zA-Z0-9-]+\.(json|svg)$/;
 const TTL = 60 * 60 * 24 * 7;
 
 type Ctx = { waitUntil(p: Promise<unknown>): void };
@@ -9,7 +11,17 @@ type Ctx = { waitUntil(p: Promise<unknown>): void };
 export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
-    // /icons/<set>/<icon>.svg are static files in production (the icon shards); elsewhere answer them from the registry route.
+    if (request.method === "GET" || request.method === "HEAD") {
+      const redirect = iconRedirect(url.pathname, url.searchParams);
+      if (redirect) {
+        const dest = new URL(redirect.location, url.origin);
+        return new Response(null, {
+          status: 301,
+          headers: { location: dest.toString(), "cache-control": "public, max-age=86400" },
+        });
+      }
+    }
+    // /icons/<set>/<icon>.svg is answered by the registry route (the icon Workers used to serve a static copy).
     const svg = /^\/icons\/([a-z0-9-]+)\/([a-z0-9-]+)\.svg$/.exec(url.pathname);
     if (svg) {
       url.pathname = `/r/icons/${svg[1]}/${svg[2]}.svg`;

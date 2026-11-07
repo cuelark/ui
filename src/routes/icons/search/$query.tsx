@@ -1,9 +1,9 @@
 import { Link, createFileRoute } from "@tanstack/react-router";
 
+import { IconSearchResults } from "@/components/site/icon-search-results";
 import { SITE } from "@/content/site";
 import { POPULAR_SEARCHES, relatedTerms, termFromSlug, titleCase } from "@/lib/icon-seo";
 import { kebab } from "@/lib/icon-slugs";
-import { svgMarkup } from "@/lib/icons";
 import { searchIcons } from "@/lib/icons-server";
 import { ld, seo } from "@/lib/seo";
 
@@ -37,12 +37,14 @@ export const Route = createFileRoute("/icons/search/$query")({
           { name: "Icons", path: "/icons" },
           { name: `${T} icons`, path },
         ]),
-        ld.collection(
-          `${T} icons`,
-          `${total} ${q} icons`,
-          path,
-          loaderData.results.slice(0, 30).map((r) => ({ name: `${r.slug.replace(/-/g, " ")} (${r.setName})`, path: `/icons/${r.setSlug}/${r.slug}` })),
-        ),
+        {
+          "@type": "CollectionPage",
+          name: `${T} icons`,
+          description: `${total.toLocaleString()} free ${q} icons`,
+          url: `${SITE.url}${path}`,
+          numberOfItems: total,
+          isPartOf: { "@id": `${SITE.url}/#website` },
+        },
       ],
     });
   },
@@ -72,7 +74,7 @@ function SearchPage() {
         <span className="cue-label">{total.toLocaleString()} results across {bySet.length} sets</span>
         <h1 className="text-4xl font-semibold tracking-tight sm:text-5xl">{T} icons</h1>
         <p className="max-w-2xl text-lg text-muted-foreground">
-          {total ? `${total.toLocaleString()} free ${q} icons` : `No ${q} icons yet`} from every major icon set. Open any icon to download the SVG or copy it as a static or animated React component.
+          {total ? `${total.toLocaleString()} free ${q} icons` : `No ${q} icons yet`} from every major icon set. Select an icon to copy the SVG or JSX, or open its set.
         </p>
         {synonyms.length > 0 && (
           <p className="text-sm text-muted-foreground">
@@ -104,21 +106,7 @@ function SearchPage() {
         </nav>
       )}
 
-      <ul className="grid grid-cols-[repeat(auto-fill,minmax(7.5rem,1fr))] gap-2">
-        {results.map((r) => (
-          <li key={`${r.setSlug}/${r.slug}`}>
-            <Link
-              to="/icons/$set/$icon"
-              params={{ set: r.setSlug, icon: r.slug }}
-              className="grid justify-items-center gap-1.5 rounded-xl border border-transparent p-3 text-center outline-none transition-colors hover:border-border hover:bg-card focus-visible:ring-3 focus-visible:ring-ring/50"
-            >
-              <span className="text-2xl" dangerouslySetInnerHTML={{ __html: svgMarkup(r.data) }} />
-              <span className="w-full truncate text-[0.6875rem]">{r.slug.replace(/-/g, " ")}</span>
-              <span className="w-full truncate text-[0.625rem] text-muted-foreground">{r.setName}</span>
-            </Link>
-          </li>
-        ))}
-      </ul>
+      <IconSearchResults results={results} />
 
       {pages > 1 && (
         <nav aria-label="Pages" className="flex flex-wrap justify-center gap-1">

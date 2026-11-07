@@ -6,7 +6,7 @@
  *   src/styles/cuelark.css   committed (the docs site's copy of the theme item)
  *   public/sitemap.xml, public/llms.txt, public/llms-full.txt   build output
  */
-import { writeFileSync } from "node:fs";
+import { readdirSync, unlinkSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { ROOT, buildLlms, buildLlmsFull, buildRegistry, buildRobots, buildSitemaps, buildThemeCss } from "./registry-data.ts";
 
@@ -20,4 +20,9 @@ const files: Record<string, string> = {
 };
 
 for (const [path, content] of Object.entries(files)) writeFileSync(join(ROOT, path), content);
+// Per-icon sitemaps are no longer generated. Drop any left behind by an older build so they are not deployed.
+const publicDir = join(ROOT, "public");
+for (const name of readdirSync(publicDir)) {
+  if (name.startsWith("sitemap-icons-") && name.endsWith(".xml")) unlinkSync(join(publicDir, name));
+}
 console.log(`[registry] wrote ${Object.keys(files).length} files (registry.json, theme CSS, sitemaps, llms.txt)`);

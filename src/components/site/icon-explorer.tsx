@@ -15,12 +15,38 @@ import { cn } from "@/lib/utils";
 type Selected = { set: IconSetMeta; name: string; slug: string; data: IconData };
 const GROUP_LIMIT = 96;
 const PAGE = 240;
+const STYLES = ["outline", "filled", "bold", "thin", "light", "duotone", "mini", "regular"] as const;
+type IconStyle = (typeof STYLES)[number] | "plain";
+const STYLE_LABEL: Record<(typeof STYLES)[number], string> = {
+  outline: "Outline",
+  filled: "Filled",
+  bold: "Bold",
+  thin: "Thin",
+  light: "Light",
+  duotone: "Duotone",
+  mini: "Mini",
+  regular: "Regular",
+};
 
-/** Every icon from every react-icons set, searchable, animatable and installable. */
-export function IconExplorer({ initialSet }: { initialSet?: string }) {
+/** Style word encoded in the icon name, when the set has more than one. */
+function iconStyle(words: string): IconStyle {
+  if (/\b(outline|outlined)\b/.test(words)) return "outline";
+  if (/\bduotone\b/.test(words)) return "duotone";
+  if (/\b(fill|filled)\b/.test(words)) return "filled";
+  if (/\bbold\b/.test(words)) return "bold";
+  if (/\bthin\b/.test(words)) return "thin";
+  if (/\blight\b/.test(words)) return "light";
+  if (/\bmini\b/.test(words)) return "mini";
+  if (/\breg\b/.test(words)) return "regular";
+  return "plain";
+}
+
+/** Every icon from every react-icons set, searchable, filterable and copyable. `lockedSet` is a react-icons id. */
+export function IconExplorer({ lockedSet }: { lockedSet?: string }) {
   const [index, setIndex] = React.useState<IconIndex | null>(null);
   const [query, setQuery] = React.useState("");
-  const [setFilter, setSetFilter] = React.useState(initialSet ?? "all");
+  const [setFilter, setSetFilter] = React.useState(lockedSet ?? "all");
+  const [style, setStyle] = React.useState<(typeof STYLES)[number] | "all">("all");
   const [animation, setAnimation] = React.useState<IconAnimation | "off">("off");
   const [selected, setSelected] = React.useState<Selected | null>(null);
   const deferred = React.useDeferredValue(query);
@@ -35,7 +61,7 @@ export function IconExplorer({ initialSet }: { initialSet?: string }) {
     return Object.fromEntries(index.sets.map((s) => [s.id, index.names[s.id]!.map((n) => `${iconWords(n, s.id)} ${n.toLowerCase()}`)]));
   }, [index]);
 
-  const results = React.useMemo(() => {
+  const matched = React.useMemo(() => {
     if (!index || !words) return [];
     const terms = deferred.toLowerCase().split(/\s+/).filter(Boolean);
     const groups = expandQuery(deferred);
@@ -45,11 +71,30 @@ export function IconExplorer({ initialSet }: { initialSet?: string }) {
       .map((s) => {
         const all = index.names[s.id]!;
         const keep = terms.length ? all.flatMap((_, i) => (hit(words[s.id]![i]!) ? [i] : [])) : all.map((_, i) => i);
-        return { set: s, names: keep.map((i) => all[i]!), slugs: keep.map((i) => index.slugs[s.id]![i]!) };
+        return { set: s, names: keep.map((i) => all[i]!), slugs: keep.map((i) => index.slugs[s.id]![i]!), words: keep.map((i) => words[s.id]![i]!) };
       })
       .filter((g) => g.names.length);
   }, [index, words, deferred, setFilter]);
+  const styleCounts = React.useMemo(() => {
+    const counts = Object.fromEntries(STYLES.map((s) => [s, 0])) as Record<(typeof STYLES)[number], number>;
+    for (const g of matched) for (const w of g.words) {
+      const kind = iconStyle(w);
+      if (kind !== "plain") counts[kind] += 1;
+    }
+    return counts;
+  }, [matched]);
+  const activeStyle = style !== "all" && styleCounts[style] > 0 ? style : "all";
+  const results = React.useMemo(() => {
+    if (activeStyle === "all") return matched;
+    return matched
+      .map((g) => {
+        const keep = g.names.flatMap((_, i) => (iconStyle(g.words[i]!) === activeStyle ? [i] : []));
+        return { set: g.set, names: keep.map((i) => g.names[i]!), slugs: keep.map((i) => g.slugs[i]!) };
+      })
+      .filter((g) => g.names.length);
+  }, [matched, activeStyle]);
   const total = results.reduce((n, g) => n + g.names.length, 0);
+  const styleChoices = STYLES.filter((s) => styleCounts[s] > 0);
 
   return (
     <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_21rem]">
@@ -65,21 +110,35 @@ export function IconExplorer({ initialSet }: { initialSet?: string }) {
             onChange={(e) => setQuery(e.target.value)}
           />
           <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
-            <label className="flex items-center gap-2 text-sm">
-              <span className="text-muted-foreground">Set</span>
-              <select
-                value={setFilter}
-                onChange={(e) => setSetFilter(e.target.value)}
-                className="h-8 rounded-lg border border-input bg-card px-2 text-sm outline-none focus-visible:ring-3 focus-visible:ring-ring/40"
-              >
-                <option value="all">All sets ({index?.sets.length ?? 31})</option>
-                {index?.sets.map((s) => (
-                  <option key={s.id} value={s.id}>
-                    {s.name} · {s.count.toLocaleString()}
-                  </option>
+            {!lockedSet && (
+              <label className="flex items-center gap-2 text-sm">
+                <span className="text-muted-foreground">Set</span>
+                <select
+                  value={setFilter}
+                  onChange={(e) => setSetFilter(e.target.value)}
+                  className="h-8 rounded-lg border border-input bg-card px-2 text-sm outline-none focus-visible:ring-3 focus-visible:ring-ring/40"
+                >
+                  <option value="all">All sets ({index?.sets.length ?? 31})</option>
+                  {index?.sets.map((s) => (
+                    <option key={s.id} value={s.id}>
+                      {s.name} · {s.count.toLocaleString()}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            )}
+            {styleChoices.length > 0 && (
+              <div role="radiogroup" aria-label="Filter by style" className="flex min-w-0 gap-1 overflow-x-auto [scrollbar-width:none]">
+                <StyleChip checked={activeStyle === "all"} onClick={() => setStyle("all")}>
+                  All
+                </StyleChip>
+                {styleChoices.map((s) => (
+                  <StyleChip key={s} checked={activeStyle === s} onClick={() => setStyle(s)}>
+                    {STYLE_LABEL[s]} <span className="font-mono text-[0.625rem] opacity-70">{styleCounts[s].toLocaleString()}</span>
+                  </StyleChip>
                 ))}
-              </select>
-            </label>
+              </div>
+            )}
             <div className="flex min-w-0 flex-1 basis-full items-center gap-2 sm:basis-auto">
               <span className="shrink-0 text-sm text-muted-foreground">Hover</span>
               <div role="radiogroup" aria-label="Hover animation" className="flex min-w-0 gap-1 overflow-x-auto [scrollbar-width:none]">
@@ -105,7 +164,7 @@ export function IconExplorer({ initialSet }: { initialSet?: string }) {
             Also matching: {relatedTerms(deferred, 6).join(", ")}
           </p>
         )}
-        {deferred.trim() && total > 0 && (
+        {!lockedSet && deferred.trim() && total > 0 && (
           <Link
             to="/icons/search/$query"
             params={{ query: kebab(deferred) }}
@@ -131,7 +190,7 @@ export function IconExplorer({ initialSet }: { initialSet?: string }) {
           />
         ))}
       </div>
-      <IconDetail selected={selected} animation={animation} onClose={() => setSelected(null)} />
+      <IconDetail selected={selected} animation={animation} showSetLink={!lockedSet} onClose={() => setSelected(null)} />
     </div>
   );
 }
@@ -247,13 +306,27 @@ function IconGridSkeleton() {
 }
 
 /** Selected icon: a clean side panel with a preview, one-click copies and install commands. */
-function IconDetail({ selected, animation: picked, onClose }: { selected: Selected | null; animation: IconAnimation | "off"; onClose: () => void }) {
+function StyleChip({ checked, onClick, children }: { checked: boolean; onClick: () => void; children: React.ReactNode }) {
+  return (
+    <button
+      type="button"
+      role="radio"
+      aria-checked={checked}
+      onClick={onClick}
+      className="inline-flex h-7 shrink-0 items-center gap-1 rounded-full border border-transparent px-2.5 text-xs whitespace-nowrap text-muted-foreground hover:bg-muted aria-checked:border-border aria-checked:bg-card aria-checked:text-foreground aria-checked:shadow-control"
+    >
+      {children}
+    </button>
+  );
+}
+
+function IconDetail({ selected, animation: picked, showSetLink, onClose }: { selected: Selected | null; animation: IconAnimation | "off"; showSetLink: boolean; onClose: () => void }) {
   const animation: IconAnimation = picked === "off" ? "auto" : picked;
   return (
     <aside aria-label="Icon details" className={cn("min-w-0 lg:sticky lg:top-20 lg:self-start", !selected && "hidden lg:block")}>
       <div className="flex flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-raised max-lg:fixed max-lg:inset-x-3 max-lg:bottom-3 max-lg:z-40 max-lg:max-h-[75dvh] lg:max-h-[calc(100dvh-6rem)]">
         {selected ? (
-          <Detail key={`${selected.set.id}/${selected.name}`} selected={selected} animation={animation} onClose={onClose} />
+          <Detail key={`${selected.set.id}/${selected.name}`} selected={selected} animation={animation} showSetLink={showSetLink} onClose={onClose} />
         ) : (
           <div className="grid place-items-center gap-2 px-6 py-16 text-center">
             <SearchIcon className="size-5 text-muted-foreground" />
@@ -265,7 +338,7 @@ function IconDetail({ selected, animation: picked, onClose }: { selected: Select
   );
 }
 
-function Detail({ selected, animation, onClose }: { selected: Selected; animation: IconAnimation; onClose: () => void }) {
+function Detail({ selected, animation, showSetLink, onClose }: { selected: Selected; animation: IconAnimation; showSetLink: boolean; onClose: () => void }) {
   const { set, name, slug, data } = selected;
   const resolved = animation === "auto" ? animationFor(name) : animation;
   const base = `${SITE.url}/r/icons/${setSlug(set.id)}/${slug}`;
@@ -279,20 +352,20 @@ function Detail({ selected, animation, onClose }: { selected: Selected; animatio
       {/* Header */}
       <div className="flex shrink-0 items-start gap-3 border-b border-border px-4 py-3">
         <div className="grid min-w-0 flex-1 gap-0.5">
-          <Link to="/icons/$set/$icon" params={{ set: setSlug(set.id), icon: slug }} className="truncate text-sm font-semibold hover:underline">
-            {iconTitle(name, set.id)}
-          </Link>
+          <span className="truncate text-sm font-semibold">{iconTitle(name, set.id)}</span>
           <span className="truncate font-mono text-[0.6875rem] text-muted-foreground">
             {name} · {set.name}
           </span>
         </div>
-        <Link
-          to="/icons/$set/$icon"
-          params={{ set: setSlug(set.id), icon: slug }}
-          className="inline-flex h-7 shrink-0 items-center gap-1 rounded-full border border-border px-2.5 text-xs font-medium hover:bg-muted"
-        >
-          Page <ArrowUpRightIcon className="size-3" />
-        </Link>
+        {showSetLink && (
+          <Link
+            to="/icons/$set"
+            params={{ set: setSlug(set.id) }}
+            className="inline-flex h-7 shrink-0 items-center gap-1 rounded-full border border-border px-2.5 text-xs font-medium hover:bg-muted"
+          >
+            Set <ArrowUpRightIcon className="size-3" />
+          </Link>
+        )}
         <button type="button" onClick={onClose} aria-label="Close" className="grid size-7 shrink-0 place-items-center rounded-md text-muted-foreground hover:bg-muted hover:text-foreground lg:hidden">
           <XIcon className="size-4" />
         </button>
