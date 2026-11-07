@@ -2,7 +2,7 @@ import { Link, createFileRoute } from "@tanstack/react-router";
 
 import { IconSearchResults } from "@/components/site/icon-search-results";
 import { SITE } from "@/content/site";
-import { POPULAR_SEARCHES, relatedTerms, termFromSlug, titleCase } from "@/lib/icon-seo";
+import { POPULAR_SEARCHES, relatedSearchSlugs, relatedTerms, termFromSlug, titleCase } from "@/lib/icon-seo";
 import { kebab } from "@/lib/icon-slugs";
 import { searchIcons } from "@/lib/icons-server";
 import { ld, seo } from "@/lib/seo";
@@ -27,9 +27,9 @@ export const Route = createFileRoute("/icons/search/$query")({
       description: `Browse ${total.toLocaleString()} free ${q} icons from Lucide, Heroicons, Font Awesome, Phosphor and more. Download the SVG or copy a React component in one click.`,
       // Filtered (?set=) and paged variants all canonicalize to the main results page.
       path,
-      // Only the prerendered popular searches are indexed; any other term is rendered on request (and robots.txt
-      // keeps crawlers off it), so it stays out of the index too.
-      noindex: total === 0 || !POPULAR_SEARCHES.includes(kebab(q) || params.query),
+      // Search URLs repeat one template per term. They stay crawlable (robots.txt does not block them) and out of
+      // the sitemap; noindex tells crawlers not to index the template.
+      noindex: true,
       keywords: [...relatedTerms(q, 6).map((t) => `${t} icon`), `${q} icon`, `${q} icons`, `${q} icon svg`, `${q} icon react`, `free ${q} icons`, `${q} icon png svg`, `animated ${q} icon`, `${q} icon tailwind`, `${q} icon shadcn`, `${q} vector icon`],
       jsonLd: [
         ld.breadcrumbs([
@@ -56,7 +56,7 @@ function SearchPage() {
   const { query } = Route.useParams();
   const T = titleCase(q);
   const synonyms = relatedTerms(q, 10);
-  const related = [...new Set([...synonyms.map(kebab), ...POPULAR_SEARCHES.filter((t) => t !== kebab(q) && (t.includes(q.split(" ")[0]!) || q.includes(t.split("-")[0]!)))])].filter((t) => t !== kebab(q)).slice(0, 14);
+  const related = relatedSearchSlugs(q, 14);
   // Neighbouring searches (wrapping round the list) instead of always the first 24, so every search page gets inlinks.
   const all = [...new Set(POPULAR_SEARCHES)];
   const at = Math.max(0, all.indexOf(kebab(q)));

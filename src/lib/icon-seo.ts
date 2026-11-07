@@ -1,4 +1,5 @@
 /** Synonyms and keyword lists for icon search. Set-page titles live in icon-set-seo.ts. */
+import { kebab } from "./icon-slugs.ts";
 
 /**
  * Concept groups: words people use interchangeably when looking for the same icon. Matching is bidirectional, so
@@ -136,6 +137,35 @@ export function expandQuery(q: string) {
     .map((t) => [t, ...(SYNONYMS[t] ?? []).filter((x) => !x.includes(" "))]);
 }
 
+/** Alphanumeric pieces of a name or query. Hyphens and spaces are boundaries, not characters to match through. */
+export function iconTokens(value: string) {
+  return value.toLowerCase().split(/[^a-z0-9]+/).filter(Boolean);
+}
+
+/** True when `term` is a whole token, or consecutive tokens when the term itself has spaces or hyphens. */
+export function tokenMatch(tokens: readonly string[], term: string) {
+  const parts = iconTokens(term);
+  if (!parts.length || parts.length > tokens.length) return false;
+  if (parts.length === 1) return tokens.includes(parts[0]!);
+  for (let i = 0; i <= tokens.length - parts.length; i++) {
+    let same = true;
+    for (let j = 0; j < parts.length; j++) if (tokens[i + j] !== parts[j]) same = false;
+    if (same) return true;
+  }
+  return false;
+}
+
+/**
+ * Every query word matches a whole token, or a whole-token synonym of that word.
+ * "ai" matches an icon named "ai" or "open ai", and does not match "chair", "mail" or "stairs".
+ */
+export function iconMatchesQuery(words: string, query: string) {
+  const tokens = iconTokens(words);
+  const groups = expandQuery(query);
+  if (!groups.length) return false;
+  return groups.every((group) => group.some((term) => tokenMatch(tokens, term)));
+}
+
 const unique = (xs: string[]) => [...new Set(xs.map((x) => x.trim()).filter(Boolean))];
 
 /** Keyword list for one icon: exact, intent, framework and synonym long-tails. */
@@ -159,7 +189,10 @@ export function iconKeywords(words: string, setName: string) {
   ]);
 }
 
-/** High-intent icon searches that get their own indexable results page (/icons/search/<term>) and sitemap entry. */
+/**
+ * Icon searches linked from the hub (/icons/search/<term>). The pages stay crawlable and working, but they are
+ * noindex and are not sitemap entries: the same template repeated for every term is thin content.
+ */
 export const POPULAR_SEARCHES = [
   "agent", "ai", "assistant", "bot", "robot", "chatbot", "automation", "brain", "idea", "workflow", "api", "plugin", "integration",
   "arrow", "arrow-right", "arrow-left", "arrow-up", "arrow-down", "chevron", "chevron-down", "chevron-right", "home", "user", "users", "settings",
@@ -178,3 +211,12 @@ export const POPULAR_SEARCHES = [
 /** "arrow-right" → "arrow right" */
 export const termFromSlug = (slug: string) => decodeURIComponent(slug).replace(/[-_+]+/g, " ").trim().toLowerCase();
 export const titleCase = (s: string) => s.replace(/\b\w/g, (c) => c.toUpperCase());
+
+/** Related result links: synonym phrases, plus popular terms that share a whole token. */
+export function relatedSearchSlugs(q: string, limit = 14) {
+  const slug = kebab(q);
+  const qTokens = new Set(iconTokens(q));
+  const fromSynonyms = relatedTerms(q, 10).map((t) => kebab(t));
+  const fromTokens = POPULAR_SEARCHES.filter((t) => t !== slug && iconTokens(t.replace(/-/g, " ")).some((tok) => qTokens.has(tok)));
+  return [...new Set([...fromSynonyms, ...fromTokens])].filter((t) => t && t !== slug).slice(0, limit);
+}
