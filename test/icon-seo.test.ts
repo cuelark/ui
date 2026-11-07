@@ -3,7 +3,7 @@ import { test } from "node:test";
 
 import { createRequire } from "node:module";
 
-import { expandQuery, iconKeywords, relatedTerms, termFromSlug } from "../src/lib/icon-seo.ts";
+import { expandQuery, iconKeywords, POPULAR_SEARCHES, relatedTerms, termFromSlug } from "../src/lib/icon-seo.ts";
 import { iconRedirect } from "../src/lib/icon-redirect.ts";
 import { HUB_DESCRIPTION, HUB_TITLE, licenseLabel, setPageCopy, titleUnder60 } from "../src/lib/icon-set-seo.ts";
 import { kebab, setIdFromSlug, setSlug } from "../src/lib/icon-slugs.ts";
@@ -25,6 +25,10 @@ test("query expansion keeps the original word first", () => {
 test("icon keywords include long-tail and synonym phrases", () => {
   const k = iconKeywords("robot", "Lucide");
   for (const phrase of ["robot icon", "robot icon react", "animated robot icon", "agent icon"]) assert.ok(k.includes(phrase), phrase);
+});
+
+test("popular searches are listed once", () => {
+  assert.equal(new Set(POPULAR_SEARCHES).size, POPULAR_SEARCHES.length);
 });
 
 test("slugs are readable and reversible", () => {

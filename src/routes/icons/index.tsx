@@ -51,7 +51,7 @@ function IconsPage() {
           Popular icon searches
         </h2>
         <ul className="flex flex-wrap gap-2">
-          {POPULAR_SEARCHES.map((t) => (
+          {[...new Set(POPULAR_SEARCHES)].map((t) => (
             <li key={t}>
               <Link to="/icons/search/$query" params={{ query: t }} className="inline-flex h-8 items-center rounded-full border border-border bg-card px-3 text-sm transition-colors hover:bg-muted">
                 {titleCase(t.replace(/-/g, " "))} icons
