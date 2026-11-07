@@ -3,20 +3,18 @@ import { Link, createFileRoute } from "@tanstack/react-router";
 import { IconExplorer } from "@/components/site/icon-explorer";
 import { IconLicense } from "@/components/site/icon-license";
 import { POPULAR_SEARCHES, titleCase } from "@/lib/icon-seo";
+import { HUB_DESCRIPTION, HUB_TITLE } from "@/lib/icon-set-seo";
 import { getIconSets } from "@/lib/icons-server";
 import { SITE } from "@/content/site";
 import { ld, seo } from "@/lib/seo";
 
-const TITLE = "50,000+ Free React Icons: Search, Animate, Install";
-const DESCRIPTION =
-  "Search 50,000+ free icons from Lucide, Font Awesome, Material, Heroicons, Phosphor and more. Animate any icon, copy JSX or SVG, or install it with the shadcn CLI.";
-
 export const Route = createFileRoute("/icons/")({
   loader: () => getIconSets(),
-  head: () =>
-    seo({
-      title: TITLE,
-      description: DESCRIPTION,
+  head: ({ loaderData }) => {
+    const sets = loaderData ?? [];
+    return seo({
+      title: HUB_TITLE,
+      description: HUB_DESCRIPTION,
       path: "/icons",
       keywords: ["react icons", "free svg icons", "animated icons react", "shadcn icons", "lucide icons", "font awesome react", "heroicons", "material icons react", "icon search", "icon library"],
       jsonLd: [
@@ -24,8 +22,15 @@ export const Route = createFileRoute("/icons/")({
           { name: SITE.name, path: "/" },
           { name: "Icons", path: "/icons" },
         ]),
+        ld.collection(
+          "Free React icons",
+          HUB_DESCRIPTION,
+          "/icons",
+          sets.map((s) => ({ name: `${s.name} icons`, path: `/icons/${s.slug}` })),
+        ),
       ],
-    }),
+    });
+  },
   component: IconsPage,
 });
 
@@ -37,8 +42,7 @@ function IconsPage() {
         <span className="cue-label">Icons · 31 sets</span>
         <h1 className="text-4xl font-semibold tracking-tight text-balance sm:text-5xl">Every icon, searchable and alive</h1>
         <p className="max-w-2xl text-lg text-muted-foreground">
-          Over 50,000 icons from every react-icons set in one search. Pick an animation and hover to preview it, then copy the import, the SVG, or install the icon as its own component
-          with the shadcn CLI.
+          Over 50,000 icons from every react-icons set, searchable in the browser. Copy the SVG or JSX from the panel, or open a set to browse that library on its own. Each set keeps its original license.
         </p>
       </header>
       <IconExplorer />

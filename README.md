@@ -30,7 +30,7 @@ npx shadcn@latest add https://ui.cuelark.com/r/theme.json
 - **Motion and effects:** text reveal, number ticker, marquee, tilt card, border beam, orbit, flip grid and more. All motion
   scales with one `--cl-motion` token and respects `prefers-reduced-motion`.
 - **Theming:** presets, fonts, radius, density and accent colors, editable live and exported as CSS.
-- **Icons:** every [react-icons](https://react-icons.github.io/react-icons/) set, searchable, with a page per icon. Copy the
+- **Icons:** every [react-icons](https://react-icons.github.io/react-icons/) set, with one searchable page per set. Copy the
   SVG or JSX, or install any icon as a static or dependency-free animated component:
 
   ```bash

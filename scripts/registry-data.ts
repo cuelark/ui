@@ -134,31 +134,34 @@ const urlset = (paths: string[], lastmod: string) =>
   `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${paths.map((p) => `  <url><loc>${SITE.url}${p === "/" ? "" : p}</loc><lastmod>${lastmod}</lastmod></url>`).join("\n")}\n</urlset>\n`;
 
 /**
- * Sitemaps: /sitemap.xml is an index of the docs pages plus one file per icon set (every icon has its own page),
- * keeping each file well under the 50,000-URL limit. Icon names come from public/icons/index.json (icons:build).
+ * Sitemaps: /sitemap.xml is an index. Page URLs live in sitemap-pages.xml: the docs, the icon hub, one URL per icon
+ * set and the popular icon searches. Per-icon URLs are not listed; those paths 301 to the set page.
+ * Set names come from public/icons/index.json (icons:build).
  */
 export function buildSitemaps(lastmod: string): Record<string, string> {
   const iconIndexPath = join(ROOT, "public", "icons", "index.json");
-  const icons = existsSync(iconIndexPath) ? (JSON.parse(readFileSync(iconIndexPath, "utf8")) as { sets: { id: string }[]; slugs: Record<string, string[]> }) : { sets: [], slugs: {} };
+  const icons = existsSync(iconIndexPath) ? (JSON.parse(readFileSync(iconIndexPath, "utf8")) as { sets: { id: string }[] }) : { sets: [] };
+  const searches = [...new Set(POPULAR_SEARCHES)].map((t) => `/icons/search/${t}`);
   const files: Record<string, string> = {
-    "public/sitemap-pages.xml": urlset([...sitePaths(), ...icons.sets.map((s) => `/icons/${setSlug(s.id)}`), ...POPULAR_SEARCHES.map((t) => `/icons/search/${t}`)], lastmod),
+    "public/sitemap-pages.xml": urlset([...sitePaths(), ...icons.sets.map((s) => `/icons/${setSlug(s.id)}`), ...searches], lastmod),
   };
-  for (const s of icons.sets) files[`public/sitemap-icons-${setSlug(s.id)}.xml`] = urlset(icons.slugs[s.id]!.map((slug) => `/icons/${setSlug(s.id)}/${slug}`), lastmod);
   const entries = Object.keys(files).map((f) => `  <sitemap><loc>${SITE.url}/${f.replace("public/", "")}</loc><lastmod>${lastmod}</lastmod></sitemap>`);
   files["public/sitemap.xml"] = `<?xml version="1.0" encoding="UTF-8"?>\n<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${entries.join("\n")}\n</sitemapindex>\n`;
   return files;
 }
 
 /**
- * robots.txt: everything is open to crawlers (search engines and AI assistants alike) except endpoints that run code
- * per request and have no page worth indexing: arbitrary icon searches (the popular ones are prerendered and allowed),
- * per-icon registry files, server functions and standalone previews. Keeps crawlers off the Worker request budget.
+ * robots.txt: pages are open to crawlers, including retired per-icon URLs so they can see the 301 to the set page.
+ * Arbitrary icon searches still run code per request and are not pages (the popular ones are prerendered and allowed).
+ * Per-icon registry files, server functions and standalone previews stay disallowed.
  */
 export function buildRobots() {
   return [
+    "# /icons/<set>/<icon> permanently redirects to /icons/<set>. Leave those paths allowed so crawlers fetch the 301.",
+    "# Only the popular /icons/search/<term> URLs below are pages. Any other /icons/search/ URL is disallowed.",
     "User-agent: *",
     "Allow: /",
-    ...POPULAR_SEARCHES.map((t) => `Allow: /icons/search/${t}$`),
+    ...[...new Set(POPULAR_SEARCHES)].map((t) => `Allow: /icons/search/${t}$`),
     "Disallow: /icons/search/",
     "Disallow: /r/icons/",
     "Disallow: /_serverFn/",
@@ -167,6 +170,13 @@ export function buildRobots() {
     `Sitemap: ${SITE.url}/sitemap.xml`,
     "",
   ].join("\n");
+}
+
+function iconLines() {
+  const iconIndexPath = join(ROOT, "public", "icons", "index.json");
+  if (!existsSync(iconIndexPath)) return `- [Icons](${SITE.url}/icons): one searchable page per icon set. Copy SVG or JSX on the page.`;
+  const icons = JSON.parse(readFileSync(iconIndexPath, "utf8")) as { sets: { id: string; name: string; count: number; license: string }[] };
+  return icons.sets.map((s) => `- [${s.name}](${SITE.url}/icons/${setSlug(s.id)}): ${s.count.toLocaleString("en-US")} icons, ${s.license}.`).join("\n");
 }
 
 export function buildLlms() {
@@ -198,6 +208,12 @@ ${THEMES.map((t) => `- [${t.name} theme](${SITE.url}/themes/${t.slug}): ${t.summ
 Live, inspectable demos: ${SCENARIOS.map((s, i) => `[${s.title}](${SITE.url}/agents${i ? `/${s.slug}` : ""})`).join(", ")}.
 
 ${ZONES.map((z) => `### ${z.name}\n\n${z.summary}\n\n${z.items.map((it) => `- ${components.find((c) => c.slug === it.slug)?.name ?? it.slug}: ${it.when}${it.avoid ? ` Avoid: ${it.avoid}` : ""}`).join("\n")}`).join("\n\n")}
+
+## Icons
+
+One page per icon set, plus the hub at ${SITE.url}/icons. Search and copy SVG or JSX on the page. There is no page per icon: /icons/<set>/<icon> redirects to the set. Popular terms also have a results page at ${SITE.url}/icons/search/<term>.
+
+${iconLines()}
 
 ## Optional
 
