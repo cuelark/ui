@@ -36,7 +36,7 @@ const PIECES: Piece[] = [
     children: (
       <div className={cn(chip, "grid gap-1.5")}>
         <span className="cue-label">Rate this</span>
-        <Rating defaultValue={4} label="Rate Cuelark UI" />
+        <Rating defaultValue={4} label="Rate Cuelark" />
       </div>
     ),
   },

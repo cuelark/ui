@@ -21,9 +21,7 @@ export function Logo({ className }: { className?: string }) {
   return (
     <span className={cn("inline-flex items-center gap-2 font-semibold tracking-tight", className)}>
       <Glyph />
-      <span>
-        Cuelark <span className="text-muted-foreground">UI</span>
-      </span>
+      Cuelark
     </span>
   );
 }

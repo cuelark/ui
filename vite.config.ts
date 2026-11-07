@@ -31,6 +31,8 @@ export default defineConfig({
         // are static. Per-icon URLs are not pages: the Worker 301s them (see src/worker.ts).
         filter: ({ path }) =>
           path === "/" ||
+          path === "/about" ||
+          path === "/privacy" ||
           /^\/(components|docs|agents|themes)(\/|$)/.test(path) ||
           /^\/icons(\/search\/[a-z0-9-]+|\/[a-z0-9-]+)?$/.test(path) ||
           path === "/sitemap.xml" ||
@@ -39,6 +41,8 @@ export default defineConfig({
       pages: [
         { path: "/sitemap.xml" },
         { path: "/llms.txt" },
+        { path: "/about" },
+        { path: "/privacy" },
         { path: "/icons" },
         ...Object.values(SET_SLUGS).map((slug) => ({ path: `/icons/${slug}` })),
         ...[...new Set(POPULAR_SEARCHES)].map((term) => ({ path: `/icons/search/${term}` })),

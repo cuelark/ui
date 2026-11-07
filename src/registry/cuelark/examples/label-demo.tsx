@@ -8,7 +8,7 @@ export default function LabelDemo() {
         <Label htmlFor="company" required>
           Company
         </Label>
-        <Input id="company" placeholder="Acme Inc." required />
+        <Input id="company" placeholder="Cuelark" required />
       </div>
       <div className="grid gap-2">
         <Label htmlFor="vat" optional>

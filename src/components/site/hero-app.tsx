@@ -12,6 +12,7 @@ import { Progress } from "@/registry/cuelark/ui/progress";
 import { Switch } from "@/registry/cuelark/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/registry/cuelark/ui/tabs";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/registry/cuelark/ui/tooltip";
+import { Glyph } from "./logo";
 
 if (typeof window !== "undefined") gsap.registerPlugin(ScrollTrigger);
 
@@ -65,13 +66,13 @@ export function HeroApp() {
           <span className="size-2.5 rounded-full bg-foreground/15" />
           <span className="size-2.5 rounded-full bg-foreground/15" />
           <span className="size-2.5 rounded-full bg-foreground/15" />
-          <span className="mx-auto rounded-md bg-background px-3 py-0.5 font-mono text-[0.6875rem] text-muted-foreground shadow-[0_0_0_1px_var(--border)]">app.acme.com</span>
+          <span className="mx-auto truncate rounded-md bg-background px-3 py-0.5 font-mono text-[0.6875rem] text-muted-foreground shadow-[0_0_0_1px_var(--border)]">social.cuelark.com</span>
         </div>
         <div className="grid min-h-[30rem] grid-cols-1 md:grid-cols-[13rem_1fr]">
           <aside className="hidden flex-col gap-1 border-e border-border bg-muted/30 p-3 md:flex">
             <div className="mb-3 flex items-center gap-2 px-2 pt-1 text-sm font-semibold">
-              <span className="grid size-6 place-items-center rounded-md bg-foreground font-mono text-[0.625rem] text-background">A</span>
-              Acme Inc.
+              <Glyph className="size-6" />
+              Cuelark
             </div>
             {NAV.map(({ icon: Icon, label, active, count }) => (
               <div

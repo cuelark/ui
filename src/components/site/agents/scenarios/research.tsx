@@ -208,7 +208,7 @@ export function ResearchScenario() {
   return (
     <AgentWindow
       name="research-agent"
-      context="northwind · support + surveys"
+      context="helpdesk · support + surveys"
       script={s}
       thread={thread}
       panel={panel}

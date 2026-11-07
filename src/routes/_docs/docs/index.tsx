@@ -10,11 +10,11 @@ const page = DOC_PAGES[0]!;
 export const Route = createFileRoute("/_docs/docs/")({
   head: () =>
     seo({
-      title: "Introduction to Cuelark UI",
+      title: SITE.docsTitle,
       description: page.description,
       path: page.path,
       type: "article",
-      jsonLd: [ld.article("Introduction to Cuelark UI", page.description, page.path), ld.breadcrumbs([{ name: SITE.name, path: "/" }, { name: "Docs", path: "/docs" }])],
+      jsonLd: [ld.article("React component documentation", page.description, page.path), ld.breadcrumbs([{ name: SITE.name, path: "/" }, { name: "Docs", path: "/docs" }])],
     }),
   component: Introduction,
 });
@@ -26,7 +26,7 @@ function Introduction() {
       <DocHeader label="Getting started" title="Introduction" description="A shadcn/ui registry of precise, tactile, animated components. You install the source and own it." />
       <div className="prose-cue">
         <p>
-          Cuelark UI is a set of {components.length} React components across {SECTIONS.length} categories, distributed through the{" "}
+          Cuelark is a set of {components.length} React components across {SECTIONS.length} categories, distributed through the{" "}
           <a href="https://ui.shadcn.com/docs/registry">shadcn registry</a>. There is no package to import and nothing to upgrade around. The CLI copies each component's
           source into your project, next to your own code. Each one is built on Radix primitives where interaction is involved, styled with Tailwind CSS v4 tokens, and{" "}
           {animated} of them move with <a href="https://gsap.com">GSAP</a>.
@@ -81,7 +81,7 @@ function Introduction() {
 
         <h2 id="credits">Credits and license</h2>
         <p>
-          Cuelark UI is MIT licensed and made by <a href={SITE.parent.url}>Cuelark</a>. It stands on <a href="https://ui.shadcn.com">shadcn/ui</a>,{" "}
+          These components are MIT licensed and made by <a href={SITE.parent.url}>Cuelark</a>. They stand on <a href="https://ui.shadcn.com">shadcn/ui</a>,{" "}
           <a href="https://www.radix-ui.com">Radix UI</a>, <a href="https://tailwindcss.com">Tailwind CSS</a>, <a href="https://gsap.com">GSAP</a> (free under its own standard license),{" "}
           <a href="https://cmdk.paco.me">cmdk</a> and <a href="https://input-otp.rodz.dev">input-otp</a>.
         </p>

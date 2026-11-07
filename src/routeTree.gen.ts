@@ -11,6 +11,8 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as DocsRouteImport } from './routes/_docs'
+import { Route as AboutRouteImport } from './routes/about'
+import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as AgentsIndexRouteImport } from './routes/agents/index'
 import { Route as AgentsScenarioRouteImport } from './routes/agents/$scenario'
 import { Route as IconsIndexRouteImport } from './routes/icons/index'
@@ -33,6 +35,16 @@ const IndexRoute = IndexRouteImport.update({
 } as any)
 const DocsRoute = DocsRouteImport.update({
   id: '/_docs',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AboutRoute = AboutRouteImport.update({
+  id: '/about',
+  path: '/about',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrivacyRoute = PrivacyRouteImport.update({
+  id: '/privacy',
+  path: '/privacy',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AgentsIndexRoute = AgentsIndexRouteImport.update({
@@ -108,6 +120,8 @@ const RIconsSetFileRoute = RIconsSetFileRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
+  '/privacy': typeof PrivacyRoute
   '/agents/$scenario': typeof AgentsScenarioRoute
   '/preview/$name': typeof PreviewNameRoute
   '/themes/$slug': typeof ThemesSlugRoute
@@ -125,6 +139,8 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
+  '/privacy': typeof PrivacyRoute
   '/agents/$scenario': typeof AgentsScenarioRoute
   '/preview/$name': typeof PreviewNameRoute
   '/themes/$slug': typeof ThemesSlugRoute
@@ -144,6 +160,8 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_docs': typeof DocsRouteWithChildren
+  '/about': typeof AboutRoute
+  '/privacy': typeof PrivacyRoute
   '/agents/$scenario': typeof AgentsScenarioRoute
   '/preview/$name': typeof PreviewNameRoute
   '/themes/$slug': typeof ThemesSlugRoute
@@ -163,6 +181,8 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/about'
+    | '/privacy'
     | '/agents/$scenario'
     | '/preview/$name'
     | '/themes/$slug'
@@ -180,6 +200,8 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/about'
+    | '/privacy'
     | '/agents/$scenario'
     | '/preview/$name'
     | '/themes/$slug'
@@ -198,6 +220,8 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/_docs'
+    | '/about'
+    | '/privacy'
     | '/agents/$scenario'
     | '/preview/$name'
     | '/themes/$slug'
@@ -217,6 +241,8 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   DocsRoute: typeof DocsRouteWithChildren
+  AboutRoute: typeof AboutRoute
+  PrivacyRoute: typeof PrivacyRoute
   AgentsScenarioRoute: typeof AgentsScenarioRoute
   PreviewNameRoute: typeof PreviewNameRoute
   ThemesSlugRoute: typeof ThemesSlugRoute
@@ -242,6 +268,20 @@ declare module '@tanstack/react-router' {
       path: ''
       fullPath: '/'
       preLoaderRoute: typeof DocsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/about': {
+      id: '/about'
+      path: '/about'
+      fullPath: '/about'
+      preLoaderRoute: typeof AboutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/privacy': {
+      id: '/privacy'
+      path: '/privacy'
+      fullPath: '/privacy'
+      preLoaderRoute: typeof PrivacyRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/agents/': {
@@ -366,6 +406,8 @@ const DocsRouteWithChildren = DocsRoute._addFileChildren(DocsRouteChildren)
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   DocsRoute: DocsRouteWithChildren,
+  AboutRoute: AboutRoute,
+  PrivacyRoute: PrivacyRoute,
   AgentsScenarioRoute: AgentsScenarioRoute,
   PreviewNameRoute: PreviewNameRoute,
   ThemesSlugRoute: ThemesSlugRoute,

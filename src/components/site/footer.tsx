@@ -156,7 +156,18 @@ export function SiteFooter() {
             </a>
             . {components.length} components across {SECTIONS.length} categories. MIT licensed.
           </span>
-          <span>Built with Radix, Tailwind CSS and GSAP.</span>
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
+            <span>Free and open source.</span>
+            <Link to="/about" className="hover:text-foreground hover:underline">
+              About Cuelark
+            </Link>
+            <Link to="/privacy" className="hover:text-foreground hover:underline">
+              Privacy
+            </Link>
+            <a href={`mailto:${SITE.contact}`} className="hover:text-foreground hover:underline">
+              Contact
+            </a>
+          </div>
         </div>
       </div>
     </footer>

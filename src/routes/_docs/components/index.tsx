@@ -13,7 +13,7 @@ import { ToggleGroup, ToggleGroupItem } from "@/registry/cuelark/ui/toggle-group
 import { cn } from "@/lib/utils";
 
 const TITLE = "React components for shadcn/ui";
-const DESCRIPTION = `All ${components.length} Cuelark UI components, live: buttons, forms, menus, dialogs, toasts, tables and animated components like text reveal, number ticker, dock and marquee. Accessible, themeable, installable with the shadcn CLI.`;
+const DESCRIPTION = `All ${components.length} UI components, live: buttons, forms, menus, dialogs, toasts, tables and animated components like text reveal, number ticker, dock and marquee. Accessible, themeable, installable with the shadcn CLI.`;
 
 export const Route = createFileRoute("/_docs/components/")({
   head: () =>
