@@ -47,7 +47,7 @@ export function seo({ title, description: rawDescription, path, keywords, type =
     meta: [
       { title: fullTitle },
       { name: "description", content: description },
-      ...(noindex ? [{ name: "robots", content: "noindex, follow" }] : []),
+      ...(noindex ? [{ name: "robots", content: "noindex,follow" }] : []),
       ...(keywords?.length ? [{ name: "keywords", content: keywords.join(", ") }] : []),
       { property: "og:type", content: type },
       { property: "og:site_name", content: SITE.name },

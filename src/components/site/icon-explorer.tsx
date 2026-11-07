@@ -4,7 +4,7 @@ import { ArrowUpRightIcon, SearchIcon, XIcon } from "lucide-react";
 
 import { SITE } from "@/content/site";
 import { IconLicense } from "./icon-license";
-import { expandQuery, relatedTerms } from "@/lib/icon-seo";
+import { iconMatchesQuery, relatedTerms } from "@/lib/icon-seo";
 import { kebab, setSlug } from "@/lib/icon-slugs";
 import { animatedIconComponentSource, formatMarkup, iconComponentSource, iconTitle, iconWords, loadIconIndex, loadIconSet, svgMarkup, type IconData, type IconIndex, type IconSet, type IconSetMeta } from "@/lib/icons";
 import { AnimatedIcon, ANIMATIONS, animationFor, type IconAnimation } from "@/registry/cuelark/ui/animated-icon";
@@ -64,8 +64,7 @@ export function IconExplorer({ lockedSet }: { lockedSet?: string }) {
   const matched = React.useMemo(() => {
     if (!index || !words) return [];
     const terms = deferred.toLowerCase().split(/\s+/).filter(Boolean);
-    const groups = expandQuery(deferred);
-    const hit = (w: string) => terms.every((t) => w.includes(t)) || groups.every((g) => g.some((t) => ` ${w} `.includes(` ${t} `)));
+    const hit = (w: string) => iconMatchesQuery(w, deferred);
     return index.sets
       .filter((s) => setFilter === "all" || s.id === setFilter)
       .map((s) => {
