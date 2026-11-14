@@ -11,8 +11,10 @@ const owner = (name: string) => components.find((c) => c.examples.some((e) => e.
 
 /** One example alone in the window, for full-screen testing and resizing. Kept out of the index: the docs page is canonical. */
 export const Route = createFileRoute("/preview/$name")({
+  // Checked against the catalogue (every example file is listed there), not the eager example map, which would pull
+  // all 117 examples into the entry bundle every page hydrates.
   beforeLoad: ({ params }) => {
-    if (!examples[params.name]) throw notFound();
+    if (!owner(params.name)) throw notFound();
   },
   head: ({ params }) => {
     const doc = owner(params.name);

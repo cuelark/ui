@@ -30,10 +30,11 @@ for (const f of walk(ROOT)) {
   // Hydration waits for the load event: the page is fully prerendered, so text, links and CSS-only UI work at once,
   // and the 290 KB entry no longer competes with the HTML and fonts for the first paint (mobile LCP). The original tag
   // stays in place without src (an empty module, so React hydrates the same node), and the existing head script
-  // appends the real one to <head>, where React tolerates third-party tags.
+  // appends the real one to <head>, where React tolerates third-party tags. It waits one frame past load so the first
+  // paint always lands before hydration work, even when load fires early (the 1.5 s timer covers background tabs).
   const entry = /<script type="module" async="" src="([^"]+)"><\/script>/.exec(next);
   if (entry && next.includes("<script>(function(){try{")) {
-    const loader = `(function(){var u=${JSON.stringify(entry[1])};function go(){var s=document.createElement("script");s.type="module";s.src=u;document.head.appendChild(s)}if(document.readyState==="complete")go();else addEventListener("load",go,{once:true})})();`;
+    const loader = `(function(){var u=${JSON.stringify(entry[1])};var d;function go(){if(d)return;d=1;var s=document.createElement("script");s.type="module";s.src=u;document.head.appendChild(s)}function after(){requestAnimationFrame(function(){setTimeout(go,0)});setTimeout(go,1500)}if(document.readyState==="complete")after();else addEventListener("load",after,{once:true})})();`;
     next = next.replace(entry[0], `<script type="module" async="" data-src="${entry[1]}"></script>`).replace("<script>(function(){try{", `<script>${loader}(function(){try{`);
   }
   if (next === html) continue;

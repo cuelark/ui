@@ -3,7 +3,7 @@ import { SHOTS } from "@/content/agent-shots";
 import { components } from "@/content/components";
 import { SITE } from "@/content/site";
 import { ld, seo } from "@/lib/seo";
-import { AGENTS_FAQ } from "./agents-page";
+import { AGENTS_FAQ } from "./faq";
 
 const agents = components.filter((c) => c.section === "Agents");
 const KEYWORDS = [
