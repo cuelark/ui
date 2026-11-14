@@ -3,7 +3,14 @@ import { Link, createFileRoute } from "@tanstack/react-router";
 import { AccessibilityIcon, ArrowRightIcon, BoldIcon, CodeIcon, CrosshairIcon, ItalicIcon, PaletteIcon, UnderlineIcon } from "lucide-react";
 import { PiSparkleFill as SparklesIcon } from "react-icons/pi";
 
-import { examples } from "@/components/site/examples";
+// The seven demos the home page shows, imported directly: the examples map would bundle all 117.
+import OrbitDemo from "@/registry/cuelark/examples/orbit-demo";
+import FlipGridDemo from "@/registry/cuelark/examples/flip-grid-demo";
+import TabsDemo from "@/registry/cuelark/examples/tabs-demo";
+import ButtonStates from "@/registry/cuelark/examples/button-states";
+import DockDemo from "@/registry/cuelark/examples/dock-demo";
+import NumberTickerDemo from "@/registry/cuelark/examples/number-ticker-demo";
+import CommandDemo from "@/registry/cuelark/examples/command-demo";
 import { FluidBackdrop } from "@/components/site/fluid-backdrop";
 import { HeroPrompt } from "@/components/site/hero-prompt";
 import { components, SECTIONS } from "@/content/components";
@@ -76,19 +83,37 @@ function Home() {
   return (
     <main id="main" className="overflow-x-clip">
       <Hero />
-      <BuiltWith />
-      <Preview />
-      <Effects />
-      <Bento />
+      {/* Each section below the hero is its own Suspense boundary: React hydrates boundaries at low priority in
+          separate, interruptible tasks instead of one long task for the whole page (mobile TBT). Same markup. */}
+      <Suspense fallback={null}>
+        <BuiltWith />
+      </Suspense>
+      <Suspense fallback={null}>
+        <Preview />
+      </Suspense>
+      <Suspense fallback={null}>
+        <Effects />
+      </Suspense>
+      <Suspense fallback={null}>
+        <Bento />
+      </Suspense>
       <section aria-label="Motion" className="mx-auto mt-32 max-w-6xl px-4 sm:px-6">
         <Suspense fallback={null}>
           <MotionDial />
         </Suspense>
       </section>
-      <Principles />
-      <Catalog />
-      <Faq />
-      <Closing />
+      <Suspense fallback={null}>
+        <Principles />
+      </Suspense>
+      <Suspense fallback={null}>
+        <Catalog />
+      </Suspense>
+      <Suspense fallback={null}>
+        <Faq />
+      </Suspense>
+      <Suspense fallback={null}>
+        <Closing />
+      </Suspense>
     </main>
   );
 }
@@ -184,8 +209,6 @@ const FEED = [
 
 function Effects() {
   const effectCount = components.filter((c) => c.section === "Effects" || c.section === "Motion").length;
-  const OrbitDemo = examples["orbit-demo"]!;
-  const FlipGridDemo = examples["flip-grid-demo"]!;
   return (
     <section aria-labelledby="effects-title" className="mx-auto mt-32 max-w-6xl px-4 sm:px-6">
       <div className="grid gap-4 text-center">
@@ -263,11 +286,6 @@ function Tile({ title, text, slug, className, children }: { title: string; text:
 }
 
 function Bento() {
-  const TabsDemo = examples["tabs-demo"]!;
-  const ButtonStates = examples["button-states"]!;
-  const DockDemo = examples["dock-demo"]!;
-  const NumberTickerDemo = examples["number-ticker-demo"]!;
-  const CommandDemo = examples["command-demo"]!;
   return (
     <section aria-labelledby="bento-title" className="mx-auto mt-32 max-w-6xl px-4 sm:px-6">
       <SectionHeading eyebrow="Crafted interactions" title="Every component answers with a cue." center>
