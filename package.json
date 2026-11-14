@@ -34,7 +34,7 @@
   },
   "scripts": {
     "dev": "pnpm icons:build && pnpm registry:build && vite dev",
-    "build": "pnpm icons:build && pnpm registry:build && vite build",
+    "build": "pnpm icons:build && pnpm registry:build && vite build && tsx scripts/html-post.ts",
     "preview": "vite preview",
     "registry:build": "tsx scripts/registry.ts && shadcn build -o public/r",
     "typecheck": "tsc --noEmit",

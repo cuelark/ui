@@ -9,7 +9,7 @@ import { SITE } from "@/content/site";
 import { Button } from "@/registry/cuelark/ui/button";
 import { Empty, EmptyActions, EmptyDescription, EmptyIcon, EmptyTitle } from "@/registry/cuelark/ui/empty";
 import { TooltipProvider } from "@/registry/cuelark/ui/tooltip";
-import appCss from "@/styles/globals.css?url";
+import "@/styles/globals.css";
 import interFont from "@/fonts/inter/InterVariable.woff2?url";
 
 export const Route = createRootRoute({
@@ -27,7 +27,6 @@ export const Route = createRootRoute({
     links: [
       // Preload the hero font so the headline renders in Inter on first paint instead of after the CSS is parsed.
       { rel: "preload", href: interFont, as: "font", type: "font/woff2", crossOrigin: "anonymous" },
-      { rel: "stylesheet", href: appCss },
       { rel: "icon", href: "/favicon.ico", sizes: "48x48" },
       { rel: "icon", href: "/favicon.svg", type: "image/svg+xml" },
       { rel: "apple-touch-icon", href: "/apple-touch-icon.png" },

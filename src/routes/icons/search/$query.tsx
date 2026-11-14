@@ -96,11 +96,11 @@ function SearchPage() {
       {bySet.length > 1 && (
         <nav aria-label="Filter by icon set" className="flex flex-wrap gap-1.5">
           <Link to="/icons/search/$query" params={{ query }} search={{}} className={chip(!set)}>
-            All <span className="font-mono text-[0.625rem] opacity-70">{bySet.reduce((n, s) => n + s.count, 0)}</span>
+            All <span className="font-mono text-[0.625rem]">{bySet.reduce((n, s) => n + s.count, 0)}</span>
           </Link>
           {bySet.map((s) => (
             <Link key={s.slug} to="/icons/search/$query" params={{ query }} search={{ set: s.slug }} className={chip(set === s.slug)}>
-              {s.name} <span className="font-mono text-[0.625rem] opacity-70">{s.count}</span>
+              {s.name} <span className="font-mono text-[0.625rem]">{s.count}</span>
             </Link>
           ))}
         </nav>

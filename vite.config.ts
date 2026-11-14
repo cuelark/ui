@@ -38,6 +38,8 @@ export default defineConfig({
           path === "/sitemap.xml" ||
           path === "/llms.txt",
       },
+      // Inline the global stylesheet so first paint needs only the HTML (mobile FCP was ~4 s waiting on it), as on tools.
+      server: { build: { inlineCss: true } },
       pages: [
         { path: "/sitemap.xml" },
         { path: "/llms.txt" },

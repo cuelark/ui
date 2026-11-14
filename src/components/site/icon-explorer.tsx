@@ -133,7 +133,7 @@ export function IconExplorer({ lockedSet }: { lockedSet?: string }) {
                 </StyleChip>
                 {styleChoices.map((s) => (
                   <StyleChip key={s} checked={activeStyle === s} onClick={() => setStyle(s)}>
-                    {STYLE_LABEL[s]} <span className="font-mono text-[0.625rem] opacity-70">{styleCounts[s].toLocaleString()}</span>
+                    {STYLE_LABEL[s]} <span className="font-mono text-[0.625rem]">{styleCounts[s].toLocaleString()}</span>
                   </StyleChip>
                 ))}
               </div>
