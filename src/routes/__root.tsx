@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import { Suspense, type ReactNode } from "react";
 import { HeadContent, Link, Outlet, Scripts, createRootRoute, useRouterState } from "@tanstack/react-router";
 
 import { AssistantFab } from "@/components/site/assistant-fab";
@@ -62,8 +62,13 @@ function RootDocument({ children }: { children: ReactNode }) {
         <TooltipProvider>
           {!bare && <SiteHeader />}
           {children}
-          {!bare && <SiteFooter />}
-          {!bare && <AssistantFab />}
+          {/* Footer and assistant hydrate as their own low-priority Suspense boundaries, after the page content. */}
+          {!bare && (
+            <Suspense fallback={null}>
+              <SiteFooter />
+              <AssistantFab />
+            </Suspense>
+          )}
         </TooltipProvider>
         <Scripts />
       </body>
