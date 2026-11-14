@@ -10,7 +10,7 @@ import { Button } from "@/registry/cuelark/ui/button";
 import { Empty, EmptyActions, EmptyDescription, EmptyIcon, EmptyTitle } from "@/registry/cuelark/ui/empty";
 import { TooltipProvider } from "@/registry/cuelark/ui/tooltip";
 import "@/styles/globals.css";
-import interFont from "@/fonts/inter/InterVariable.woff2?url";
+import interFont from "@/fonts/inter/InterVariable-latin.woff2?url";
 
 export const Route = createRootRoute({
   head: () => ({

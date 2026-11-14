@@ -41,6 +41,10 @@ function iconStyle(words: string): IconStyle {
   return "plain";
 }
 
+function splitWords(index: IconIndex, id: string) {
+  return index.names[id]!.map((n) => `${iconWords(n, id)} ${n.toLowerCase()}`);
+}
+
 /** Every icon from every react-icons set, searchable, filterable and copyable. `lockedSet` is a react-icons id. */
 export function IconExplorer({ lockedSet }: { lockedSet?: string }) {
   const [index, setIndex] = React.useState<IconIndex | null>(null);
@@ -55,22 +59,58 @@ export function IconExplorer({ lockedSet }: { lockedSet?: string }) {
     void loadIconIndex().then(setIndex);
   }, []);
 
-  // Pre-split names into words once: "FaArrowRight" → "arrow right".
+  // Pre-split names into words: "FaArrowRight" → "arrow right". 50,000 names is a long task on a phone, so the split
+  // runs one set per idle callback after the page settles; typing before it finishes splits synchronously instead.
+  const [idleWords, setIdleWords] = React.useState<Record<string, string[]> | null>(null);
+  React.useEffect(() => {
+    if (!index) return;
+    let cancelled = false;
+    const out: Record<string, string[]> = {};
+    const queue = index.sets.map((s) => s.id);
+    const ric = (window as Window & { requestIdleCallback?: (cb: () => void, o?: { timeout: number }) => number }).requestIdleCallback;
+    const later = (fn: () => void) => (ric ? ric(fn, { timeout: 4000 }) : window.setTimeout(fn, 50));
+    const step = () => {
+      if (cancelled) return;
+      const id = queue.shift();
+      if (!id) return setIdleWords(out);
+      out[id] = splitWords(index, id);
+      later(step);
+    };
+    later(step);
+    return () => {
+      cancelled = true;
+    };
+  }, [index]);
+  const hasQuery = deferred.trim() !== "";
   const words = React.useMemo(() => {
     if (!index) return null;
-    return Object.fromEntries(index.sets.map((s) => [s.id, index.names[s.id]!.map((n) => `${iconWords(n, s.id)} ${n.toLowerCase()}`)]));
-  }, [index]);
+    if (idleWords) return idleWords;
+    if (!hasQuery && style === "all") return null;
+    return Object.fromEntries(index.sets.map((s) => [s.id, splitWords(index, s.id)]));
+  }, [index, idleWords, hasQuery, style]);
+  // Groups mount a few at a time as the list scrolls: 31 sets × 96 buttons at once is ~3,000 nodes before first input.
+  const [mountedGroups, setMountedGroups] = React.useState(3);
+  const sentinel = React.useRef<HTMLDivElement>(null);
+  React.useEffect(() => {
+    const el = sentinel.current;
+    if (!el) return;
+    const io = new IntersectionObserver(([e]) => e?.isIntersecting && setMountedGroups((n) => n + 3), { rootMargin: "800px" });
+    io.observe(el);
+    return () => io.disconnect();
+  });
 
   const matched = React.useMemo(() => {
-    if (!index || !words) return [];
+    if (!index) return [];
     const terms = deferred.toLowerCase().split(/\s+/).filter(Boolean);
+    if (terms.length && !words) return [];
     const hit = (w: string) => iconMatchesQuery(w, deferred);
     return index.sets
       .filter((s) => setFilter === "all" || s.id === setFilter)
       .map((s) => {
         const all = index.names[s.id]!;
-        const keep = terms.length ? all.flatMap((_, i) => (hit(words[s.id]![i]!) ? [i] : [])) : all.map((_, i) => i);
-        return { set: s, names: keep.map((i) => all[i]!), slugs: keep.map((i) => index.slugs[s.id]![i]!), words: keep.map((i) => words[s.id]![i]!) };
+        const w = words?.[s.id];
+        const keep = terms.length && w ? all.flatMap((_, i) => (hit(w[i]!) ? [i] : [])) : all.map((_, i) => i);
+        return { set: s, names: keep.map((i) => all[i]!), slugs: keep.map((i) => index.slugs[s.id]![i]!), words: w ? keep.map((i) => w[i]!) : [] };
       })
       .filter((g) => g.names.length);
   }, [index, words, deferred, setFilter]);
@@ -174,7 +214,7 @@ export function IconExplorer({ lockedSet }: { lockedSet?: string }) {
         )}
         {!index && <IconGridSkeleton />}
         {index && !results.length && <p className="py-16 text-center text-muted-foreground">No icons match “{deferred}”. Try a broader word.</p>}
-        {results.map((g) => (
+        {results.slice(0, mountedGroups).map((g) => (
           <IconGroup
             key={`${g.set.id}-${setFilter}-${deferred}`}
             set={g.set}
@@ -188,6 +228,7 @@ export function IconExplorer({ lockedSet }: { lockedSet?: string }) {
             onShowAll={() => setSetFilter(g.set.id)}
           />
         ))}
+        {results.length > mountedGroups && <div ref={sentinel} aria-hidden="true" className="h-px" />}
       </div>
       <IconDetail selected={selected} animation={animation} showSetLink={!lockedSet} onClose={() => setSelected(null)} />
     </div>
