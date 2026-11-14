@@ -2,6 +2,7 @@
  * Pre-renders every react-icons icon to SVG once, at build time:
  *
  *   public/icons/index.json   sets (name, license, count) + every icon name, for instant client search
+ *   public/icons/index-lite.json   the same, first 240 names per set (first paint of /icons and set pages)
  *   public/icons/<set>.json   one file per set: name → [svg attributes, inner markup], fetched lazily
  *
  * Nothing here ships in the Worker bundle; the files are static assets. Skips work when react-icons' version is
@@ -22,7 +23,7 @@ const { version } = JSON.parse(readFileSync(join(import.meta.dirname, "..", "nod
 const { IconsManifest } = require("react-icons/lib") as { IconsManifest: { id: string; name: string; projectUrl: string; license: string; licenseUrl: string }[] };
 
 const stamp = join(OUT, ".version");
-const BUILD = `${version}+slugs1`;
+const BUILD = `${version}+slugs1+lite1`;
 if (existsSync(stamp) && readFileSync(stamp, "utf8") === BUILD && !process.argv.includes("--force")) {
   console.log(`[icons] react-icons ${version} already built`);
   process.exit(0);
@@ -70,5 +71,14 @@ for (const set of IconsManifest) {
 }
 
 writeFileSync(join(OUT, "index.json"), JSON.stringify(index));
+// The first screen of every set (the explorer shows 96 per set on /icons, 240 on a set page): /icons and the set pages
+// render from this ~5% slice, and fetch the full index only when someone searches, filters or loads more.
+const LITE = 240;
+const lite = {
+  sets: index.sets,
+  names: Object.fromEntries(Object.entries(index.names).map(([id, n]) => [id, n.slice(0, LITE)])),
+  slugs: Object.fromEntries(Object.entries(index.slugs).map(([id, n]) => [id, n.slice(0, LITE)])),
+};
+writeFileSync(join(OUT, "index-lite.json"), JSON.stringify(lite));
 writeFileSync(stamp, BUILD);
 console.log(`[icons] wrote ${total} icons in ${index.sets.length} sets (react-icons ${version})`);

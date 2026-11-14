@@ -6,7 +6,7 @@ import { SITE } from "@/content/site";
 import { IconLicense } from "./icon-license";
 import { iconMatchesQuery, relatedTerms } from "@/lib/icon-seo";
 import { kebab, setSlug } from "@/lib/icon-slugs";
-import { animatedIconComponentSource, formatMarkup, iconComponentSource, iconTitle, iconWords, loadIconIndex, loadIconSet, svgMarkup, type IconData, type IconIndex, type IconSet, type IconSetMeta } from "@/lib/icons";
+import { animatedIconComponentSource, formatMarkup, iconComponentSource, iconTitle, iconWords, loadIconIndex, loadIconIndexLite, loadIconSet, svgMarkup, type IconData, type IconIndex, type IconSet, type IconSetMeta } from "@/lib/icons";
 import { AnimatedIcon, ANIMATIONS, animationFor, type IconAnimation } from "@/registry/cuelark/ui/animated-icon";
 import { CopyButton } from "@/registry/cuelark/ui/copy-button";
 import { Input } from "@/registry/cuelark/ui/input";
@@ -55,15 +55,39 @@ export function IconExplorer({ lockedSet }: { lockedSet?: string }) {
   const [selected, setSelected] = React.useState<Selected | null>(null);
   const deferred = React.useDeferredValue(query);
 
+  // First paint renders from the lite index (first 240 names per set, ~58 KB gzip). The full one (1.7 MB, ~400 KB gzip)
+  // follows in idle time, or at once when someone searches, filters, picks a style or loads more.
+  const [full, setFull] = React.useState(false);
+  const [wantFull, setWantFull] = React.useState(false);
   React.useEffect(() => {
-    void loadIconIndex().then(setIndex);
+    let live = true;
+    void loadIconIndexLite().then((i) => live && setIndex((cur) => cur ?? i));
+    const ric = (window as Window & { requestIdleCallback?: (cb: () => void, o?: { timeout: number }) => number }).requestIdleCallback;
+    const t = window.setTimeout(() => (ric ? ric(() => live && setWantFull(true), { timeout: 4000 }) : live && setWantFull(true)), 3000);
+    return () => {
+      live = false;
+      window.clearTimeout(t);
+    };
   }, []);
+  const needFull = wantFull || query !== "" || style !== "all" || setFilter !== (lockedSet ?? "all");
+  React.useEffect(() => {
+    if (!needFull || full) return;
+    let live = true;
+    void loadIconIndex().then((i) => {
+      if (!live) return;
+      setIndex(i);
+      setFull(true);
+    });
+    return () => {
+      live = false;
+    };
+  }, [needFull, full]);
 
   // Pre-split names into words: "FaArrowRight" → "arrow right". 50,000 names is a long task on a phone, so the split
   // runs one set per idle callback after the page settles; typing before it finishes splits synchronously instead.
   const [idleWords, setIdleWords] = React.useState<Record<string, string[]> | null>(null);
   React.useEffect(() => {
-    if (!index) return;
+    if (!index || !full) return;
     let cancelled = false;
     const out: Record<string, string[]> = {};
     const queue = index.sets.map((s) => s.id);
@@ -80,14 +104,14 @@ export function IconExplorer({ lockedSet }: { lockedSet?: string }) {
     return () => {
       cancelled = true;
     };
-  }, [index]);
+  }, [index, full]);
   const hasQuery = deferred.trim() !== "";
   const words = React.useMemo(() => {
-    if (!index) return null;
+    if (!index || !full) return null;
     if (idleWords) return idleWords;
     if (!hasQuery && style === "all") return null;
     return Object.fromEntries(index.sets.map((s) => [s.id, splitWords(index, s.id)]));
-  }, [index, idleWords, hasQuery, style]);
+  }, [index, full, idleWords, hasQuery, style]);
   // Groups mount a few at a time as the list scrolls: 31 sets × 96 buttons at once is ~3,000 nodes before first input.
   const [mountedGroups, setMountedGroups] = React.useState(3);
   const sentinel = React.useRef<HTMLDivElement>(null);
@@ -110,7 +134,8 @@ export function IconExplorer({ lockedSet }: { lockedSet?: string }) {
         const all = index.names[s.id]!;
         const w = words?.[s.id];
         const keep = terms.length && w ? all.flatMap((_, i) => (hit(w[i]!) ? [i] : [])) : all.map((_, i) => i);
-        return { set: s, names: keep.map((i) => all[i]!), slugs: keep.map((i) => index.slugs[s.id]![i]!), words: w ? keep.map((i) => w[i]!) : [] };
+        const count = full ? keep.length : s.count;
+        return { set: s, count, names: keep.map((i) => all[i]!), slugs: keep.map((i) => index.slugs[s.id]![i]!), words: w ? keep.map((i) => w[i]!) : [] };
       })
       .filter((g) => g.names.length);
   }, [index, words, deferred, setFilter]);
@@ -128,11 +153,11 @@ export function IconExplorer({ lockedSet }: { lockedSet?: string }) {
     return matched
       .map((g) => {
         const keep = g.names.flatMap((_, i) => (iconStyle(g.words[i]!) === activeStyle ? [i] : []));
-        return { set: g.set, names: keep.map((i) => g.names[i]!), slugs: keep.map((i) => g.slugs[i]!) };
+        return { set: g.set, count: keep.length, names: keep.map((i) => g.names[i]!), slugs: keep.map((i) => g.slugs[i]!) };
       })
       .filter((g) => g.names.length);
   }, [matched, activeStyle]);
-  const total = results.reduce((n, g) => n + g.names.length, 0);
+  const total = results.reduce((n, g) => n + g.count, 0);
   const styleChoices = STYLES.filter((s) => styleCounts[s] > 0);
 
   return (
@@ -213,11 +238,13 @@ export function IconExplorer({ lockedSet }: { lockedSet?: string }) {
           </Link>
         )}
         {!index && <IconGridSkeleton />}
-        {index && !results.length && <p className="py-16 text-center text-muted-foreground">No icons match “{deferred}”. Try a broader word.</p>}
+        {index && !results.length && needFull && !full && <IconGridSkeleton />}
+        {index && !results.length && (full || !needFull) && <p className="py-16 text-center text-muted-foreground">No icons match “{deferred}”. Try a broader word.</p>}
         {results.slice(0, mountedGroups).map((g) => (
           <IconGroup
             key={`${g.set.id}-${setFilter}-${deferred}`}
             set={g.set}
+            count={g.count}
             names={g.names}
             slugs={g.slugs}
             limit={setFilter === "all" ? GROUP_LIMIT : PAGE}
@@ -226,6 +253,7 @@ export function IconExplorer({ lockedSet }: { lockedSet?: string }) {
             selected={selected}
             onSelect={setSelected}
             onShowAll={() => setSetFilter(g.set.id)}
+            onMore={() => setWantFull(true)}
           />
         ))}
         {results.length > mountedGroups && <div ref={sentinel} aria-hidden="true" className="h-px" />}
@@ -237,6 +265,7 @@ export function IconExplorer({ lockedSet }: { lockedSet?: string }) {
 
 function IconGroup({
   set,
+  count,
   names,
   slugs,
   limit,
@@ -245,8 +274,11 @@ function IconGroup({
   selected,
   onSelect,
   onShowAll,
+  onMore,
 }: {
   set: IconSetMeta;
+  /** Icons in the group; more than `names` holds while only the lite index has loaded. */
+  count: number;
   names: string[];
   slugs: string[];
   limit: number;
@@ -255,6 +287,7 @@ function IconGroup({
   selected: Selected | null;
   onSelect: (s: Selected) => void;
   onShowAll: () => void;
+  onMore: () => void;
 }) {
   const ref = React.useRef<HTMLElement>(null);
   const [data, setData] = React.useState<IconSet | null>(null);
@@ -285,9 +318,9 @@ function IconGroup({
             {set.name}
           </Link>
         </h2>
-        <span className="font-mono text-xs text-muted-foreground">{names.length.toLocaleString()}</span>
+        <span className="font-mono text-xs text-muted-foreground">{count.toLocaleString()}</span>
         <IconLicense set={set} compact className="hidden sm:inline-flex" />
-        {!paged && names.length > limit && (
+        {!paged && count > limit && (
           <button type="button" onClick={onShowAll} className="ms-auto text-xs font-medium text-muted-foreground hover:text-foreground">
             Show all →
           </button>
@@ -326,9 +359,14 @@ function IconGroup({
           );
         })}
       </ul>
-      {paged && names.length > shown && (
-        <button type="button" onClick={() => setShown((n) => n + PAGE)} className="mx-auto h-9 rounded-full border border-border bg-card px-4 text-sm font-medium shadow-control hover:bg-muted">
-          Load {Math.min(PAGE, names.length - shown)} more
+      {paged && count > shown && (
+        <button
+          type="button"
+          onClick={() => {
+            onMore();
+            setShown((n) => n + PAGE);
+          }} className="mx-auto h-9 rounded-full border border-border bg-card px-4 text-sm font-medium shadow-control hover:bg-muted">
+          Load {Math.min(PAGE, count - shown)} more
         </button>
       )}
     </section>

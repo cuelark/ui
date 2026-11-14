@@ -39,6 +39,12 @@ export function loadIconIndex() {
   indexPromise ??= fetch("/icons/index.json").then((r) => r.json() as Promise<IconIndex>);
   return indexPromise;
 }
+let litePromise: Promise<IconIndex> | null = null;
+/** The first 240 names of each set (≈90 KB instead of 1.7 MB): enough to render the browse view before anyone searches. */
+export function loadIconIndexLite() {
+  litePromise ??= fetch("/icons/index-lite.json").then((r) => r.json() as Promise<IconIndex>);
+  return litePromise;
+}
 export function loadIconSet(id: string) {
   if (!setPromises.has(id)) setPromises.set(id, fetch(`/icons/${id}.json`).then((r) => r.json() as Promise<IconSet>));
   return setPromises.get(id)!;
