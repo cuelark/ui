@@ -158,3 +158,23 @@ test("retired icon URLs redirect to the set or the hub", () => {
   assert.equal(iconRedirect("/icons/lucide/arrow-right.svg", empty), null);
   assert.equal(iconRedirect("/components/button", empty), null);
 });
+
+test("set nouns read naturally and never say Icons twice", async () => {
+  const { setNoun, setPageCopy } = await import("../src/lib/icon-set-seo.ts");
+  const cases: [string, string][] = [
+    ["Bootstrap Icons", "Bootstrap Icons"],
+    ["Heroicons", "Heroicons"],
+    ["Heroicons 2", "Heroicons 2"],
+    ["Github Octicons", "GitHub Octicons"],
+    ["BoxIcons", "Boxicons"],
+    ["Ionicons 5", "Ionicons 5"],
+    ["Typicons", "Typicons"],
+    ["Devicons", "Devicons"],
+    ["VS Code Icons", "VS Code Codicons"],
+    ["Lucide", "Lucide Icons"],
+    ["Simple Icons", "Simple Icons"],
+    ["Font Awesome 6", "Font Awesome 6 Icons"],
+  ];
+  for (const [name, want] of cases) assert.equal(setNoun(name), want);
+  for (const [name] of cases) assert.doesNotMatch(setPageCopy({ name, count: 1234 }, "MIT license").title, /icons icons/i);
+});

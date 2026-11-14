@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 
 import { expandQuery, iconTokens, tokenMatch } from "./icon-seo";
-import { representativeIndexes } from "./icon-set-seo";
+import { representativeIndexes, setExtra } from "./icon-set-seo";
 import { setIdFromSlug, setSlug } from "./icon-slugs";
 import { iconWords, type IconData, type IconIndex, type IconSet, type IconSetMeta } from "./icons";
 
@@ -30,7 +30,13 @@ export const getIconSet = createServerFn({ method: "GET" })
       if (!name || !data) return [];
       return [{ name, slug: slugs[i] ?? name, data }];
     });
-    return { meta, setSlug: setSlug(meta.id), sample };
+    const extra = setExtra(meta.id);
+    const featured: IconSample[] = (extra?.featured.names ?? []).flatMap((name) => {
+      const at = names.indexOf(name);
+      const data = set.icons[name];
+      return at >= 0 && data ? [{ name, slug: slugs[at] ?? name, data }] : [];
+    });
+    return { meta, setSlug: setSlug(meta.id), sample, featured };
   });
 
 /** Every set's metadata (no icon data), for the icons hub. */

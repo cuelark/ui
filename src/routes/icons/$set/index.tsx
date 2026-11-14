@@ -4,7 +4,7 @@ import { IconExplorer } from "@/components/site/icon-explorer";
 import { IconLicense } from "@/components/site/icon-license";
 import { IconSample } from "@/components/site/icon-sample";
 import { SITE } from "@/content/site";
-import { licenseLabel, setAttribution, setGuide, setImportExample, setPageCopy } from "@/lib/icon-set-seo";
+import { licenseLabel, setAttribution, setExtra, setGuide, setImportExample, setPageCopy } from "@/lib/icon-set-seo";
 import { getIconSet } from "@/lib/icons-server";
 import { ld, seo } from "@/lib/seo";
 import { CopyButton } from "@/registry/cuelark/ui/copy-button";
@@ -21,13 +21,14 @@ export const Route = createFileRoute("/icons/$set/")({
     if (!loaderData) return {};
     const { meta, setSlug } = loaderData;
     const license = licenseLabel(meta.license);
-    const { label, title, description } = setPageCopy(meta, license);
+    const { noun, title, description } = setPageCopy(meta, license);
     const path = `/icons/${setSlug}`;
+    const extra = setExtra(meta.id);
     return seo({
       title,
       description,
       path,
-      keywords: [`${label} icons`, `${meta.name} icons`, `${meta.name} svg`, `${meta.name} react`, `free ${meta.name} icons`, `react-icons ${meta.id}`],
+      keywords: [noun.toLowerCase(), `${meta.name} icons`, `${meta.name} svg`, `${meta.name} react`, `free ${meta.name} icons`, `react-icons ${meta.id}`],
       jsonLd: [
         ld.breadcrumbs([
           { name: SITE.name, path: "/" },
@@ -44,6 +45,14 @@ export const Route = createFileRoute("/icons/$set/")({
           numberOfItems: meta.count,
           isPartOf: { "@id": `${SITE.url}/#website` },
         },
+        ...(extra
+          ? [
+              {
+                "@type": "FAQPage",
+                mainEntity: extra.faq.map((f) => ({ "@type": "Question", name: f.q, acceptedAnswer: { "@type": "Answer", text: f.a } })),
+              },
+            ]
+          : []),
       ],
     });
   },
@@ -51,9 +60,10 @@ export const Route = createFileRoute("/icons/$set/")({
 });
 
 function SetPage() {
-  const { meta, sample } = Route.useLoaderData();
+  const { meta, sample, featured } = Route.useLoaderData();
+  const extra = setExtra(meta.id);
   const license = licenseLabel(meta.license);
-  const { label } = setPageCopy(meta, license);
+  const { noun } = setPageCopy(meta, license);
   const guide = setGuide(meta.id);
   const exampleIcon = sample[0];
   const example = exampleIcon ? setImportExample(meta.id, exampleIcon.name) : null;
@@ -73,7 +83,7 @@ function SetPage() {
         <span className="cue-label">
           {count} icons · react-icons/{meta.id} · {meta.license}
         </span>
-        <h1 className="text-4xl font-semibold tracking-tight sm:text-5xl">{label} icons</h1>
+        <h1 className="text-4xl font-semibold tracking-tight sm:text-5xl">{noun}</h1>
         <p className="max-w-2xl text-lg text-muted-foreground">{guide}</p>
         <IconLicense set={meta} verbatim className="max-w-2xl" />
         <p className="max-w-2xl text-sm text-muted-foreground">{credit}</p>
@@ -99,7 +109,61 @@ function SetPage() {
         </div>
         <IconSample setId={meta.id} icons={sample} />
       </section>
+      {extra && featured.length > 0 && (
+        <section aria-labelledby="featured-title" className="grid gap-4">
+          <div className="grid gap-2">
+            <h2 id="featured-title" className="text-2xl font-semibold tracking-tight">
+              {extra.featured.title}
+            </h2>
+            <p className="max-w-2xl text-muted-foreground">{extra.featured.lead}</p>
+          </div>
+          <IconSample setId={meta.id} icons={featured} />
+        </section>
+      )}
+      {extra && (
+        <section aria-labelledby="classmap-title" className="grid max-w-2xl gap-3">
+          <h2 id="classmap-title" className="text-2xl font-semibold tracking-tight">
+            {extra.classMap.heading}
+          </h2>
+          <p className="text-muted-foreground">{extra.classMap.lead}</p>
+          <table className="w-full border-collapse text-sm">
+            <thead>
+              <tr className="border-b border-border text-start text-muted-foreground">
+                <th scope="col" className="py-2 pe-4 text-start font-medium">
+                  HTML class
+                </th>
+                <th scope="col" className="py-2 text-start font-medium">
+                  react-icons/{meta.id}
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {extra.classMap.rows.map(([cls, comp]) => (
+                <tr key={cls} className="border-b border-border">
+                  <td className="py-2 pe-4 font-mono">{cls}</td>
+                  <td className="py-2 font-mono">{comp}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </section>
+      )}
       <IconExplorer lockedSet={meta.id} />
+      {extra && (
+        <section aria-labelledby="faq-title" className="grid max-w-2xl gap-4">
+          <h2 id="faq-title" className="text-2xl font-semibold tracking-tight">
+            {noun} questions
+          </h2>
+          <dl className="grid gap-4">
+            {extra.faq.map((f) => (
+              <div key={f.q} className="grid gap-1">
+                <dt className="font-medium">{f.q}</dt>
+                <dd className="text-muted-foreground">{f.a}</dd>
+              </div>
+            ))}
+          </dl>
+        </section>
+      )}
     </main>
   );
 }

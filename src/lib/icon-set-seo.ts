@@ -13,6 +13,23 @@ export function licenseLabel(license: string) {
 
 const countOf = (count: number) => count.toLocaleString("en-US");
 
+/** Official spellings where the react-icons manifest differs from the project's own name. */
+const DISPLAY_NAMES: Record<string, string> = {
+  BoxIcons: "Boxicons",
+  "Github Octicons": "GitHub Octicons",
+  "VS Code": "VS Code Codicons",
+};
+
+/**
+ * The set's name as people search for it, with "Icons" added only when the name does not already say it:
+ * "Bootstrap" → "Bootstrap Icons", "Heroicons 2" → "Heroicons 2", "Github Octicons" → "GitHub Octicons".
+ */
+export function setNoun(name: string) {
+  const label = setLabel(name);
+  const display = DISPLAY_NAMES[label] ?? label;
+  return /icons\b/i.test(display) ? display : `${display} Icons`;
+}
+
 /**
  * The `<title>` `seo()` will emit. The brand suffix is kept only when the whole title stays under 60 characters.
  * Mirrors the suffix rule in src/lib/seo.ts.
@@ -32,15 +49,16 @@ export const HUB_DESCRIPTION =
 export function setPageCopy(meta: { name: string; count: number }, license: string) {
   const label = setLabel(meta.name);
   const count = countOf(meta.count);
-  const title = `${label} Icons: Free SVG & React`;
+  const noun = setNoun(meta.name);
+  const title = `${noun}: Free SVG & React`;
   titleUnder60(title);
   const candidates = [
-    `Search ${count} free ${label} icons (${license}). Copy any icon as SVG or JSX for React, and filter the set in the browser.`,
-    `Search ${count} free ${label} icons (${license}). Copy any icon as SVG or JSX for React. Filter the set in your browser.`,
-    `Search ${count} free ${label} icons (${license}). Copy SVG or JSX for React, then filter the set in the browser.`,
-    `Browse ${count} free ${label} icons (${license}). Copy any icon as SVG or JSX and filter the set in the browser.`,
-    `Search ${count} free ${label} icons. Copy any icon as SVG or JSX for React. ${license}.`,
-    `Search ${count} ${label} icons (${license}). Copy SVG or JSX for React and filter the set in the browser.`,
+    `Search ${count} free ${noun} (${license}). Copy any icon as SVG or JSX for React, and filter the set in the browser.`,
+    `Search ${count} free ${noun} (${license}). Copy any icon as SVG or JSX for React. Filter the set in your browser.`,
+    `Search ${count} free ${noun} (${license}). Copy SVG or JSX for React, then filter the set in the browser.`,
+    `Browse ${count} free ${noun} (${license}). Copy any icon as SVG or JSX and filter the set in the browser.`,
+    `Search ${count} free ${noun}. Copy any icon as SVG or JSX for React. ${license}.`,
+    `Search ${count} ${noun} (${license}). Copy SVG or JSX for React and filter the set in the browser.`,
   ];
   // Short set names land a few characters under 120; a closing clause brings them into range without pushing long names over 160.
   const description = candidates.map((d) => (d.length >= 120 ? d : `${d} Icons use currentColor.`)).find((d) => d.length >= 120 && d.length <= 160);
@@ -48,8 +66,8 @@ export function setPageCopy(meta: { name: string; count: number }, license: stri
     const lengths = candidates.map((d) => `${d.length}:${d}`).join("\n");
     throw new Error(`No description in range for ${meta.name}\n${lengths}`);
   }
-  const intro = `All ${count} ${label} icons in one place, under the ${license}. Search and filter the set, then copy the SVG or a React JSX snippet.`;
-  return { label, title, description, intro };
+  const intro = `All ${count} ${noun} in one place, under the ${license}. Search and filter the set, then copy the SVG or a React JSX snippet.`;
+  return { label, noun, title, description, intro };
 }
 
 /** How many icons a set page draws into the first HTML response. */
@@ -142,7 +160,7 @@ const SET_GUIDES: Record<string, string> = {
   vsc: "VS Code Icons are the Visual Studio Code icon set, converted by the Codicons project into an icon font. The glyphs are filled and drawn on a 16×16 viewBox, for editor chrome and VS Code extension webviews. Github Octicons are the other product UI set here, built by GitHub for GitHub and listed as MIT. The registry lists VS Code Icons as CC BY 4.0.",
   tb: "Tabler Icons are MIT-licensed SVG icons, each designed on a 24×24 grid with a 2px stroke. The default names in this package are those outline strokes. Names ending in Filled and names starting with TbBrand are the filled and brand families in the same import. Lucide and Feather are the stroke-only sets to compare. The registry lists the license as MIT.",
   tfi: "Themify Icons is a set of icons for web design and apps. The project describes them as hand-crafted and inspired by iOS 7. The SVGs are filled. Typicons is the other small general-purpose icon font in this collection; the registry lists it as CC BY-SA 3.0 and lists Themify Icons as MIT.",
-  rx: "Radix Icons is a crisp set of 15×15 icons designed by the WorkOS team. The home icon's viewBox is 0 0 15 15 and the SVG uses fill=\"none\", so they are small outline strokes for dense controls. Lucide and Feather are 24×24 strokes; Github Octicons are filled 24×24 product icons. The registry lists Radix Icons as MIT.",
+  rx: "Radix Icons is a crisp set of 15×15 icons designed by the WorkOS team. The home icon's viewBox is 0 0 15 15 and the SVG uses fill=\"none\", so they are small outline strokes for dense controls. Lucide and Feather are 24×24 strokes; GitHub Octicons are filled 24×24 product icons. The registry lists Radix Icons as MIT.",
   pi: "Phosphor Icons ships each glyph in six component-name families: an unsuffixed icon, plus Bold, Light, Thin, Fill and Duotone. That is the difference from Lucide and Feather, which are one stroke weight, and from Heroicons, which stops at outline, solid and mini. Use it when the same symbol has to match more than one text weight. The registry lists the license as MIT.",
   lia: "Icons8 Line Awesome is a set of line icons. The names follow Font Awesome (Lia beside Fa) and come in an unsuffixed form and a form ending in Solid. Font Awesome 5 and 6 in this collection are filled glyphs and are listed as CC BY 4.0. The registry lists Line Awesome as MIT.",
 };
@@ -151,4 +169,47 @@ export function setGuide(id: string) {
   const text = SET_GUIDES[id];
   if (!text) throw new Error(`Missing icon set guide for ${id}`);
   return text;
+}
+
+/**
+ * Extra, hand-written help for sets people search for by name and by class (Bootstrap Icons: "bi-rocket" → BsRocket).
+ * Only real export names; icons missing from the set are dropped by the loader.
+ */
+export type SetExtra = {
+  featured: { title: string; lead: string; names: string[] };
+  classMap: { heading: string; lead: string; rows: [string, string][] };
+  faq: { q: string; a: string }[];
+};
+
+const SET_EXTRAS: Record<string, SetExtra> = {
+  bs: {
+    featured: {
+      title: "Rocket icons in Bootstrap Icons",
+      lead: "Bootstrap Icons has four rocket glyphs: an upright rocket and a rocket taking off, each in an outline and a filled (Fill) version. All sit on the same 16×16 grid, so they line up with text at small sizes.",
+      names: ["BsRocket", "BsRocketFill", "BsRocketTakeoff", "BsRocketTakeoffFill"],
+    },
+    classMap: {
+      heading: "From a bi- class to a React component",
+      lead: "Bootstrap's own docs use the web font class, like <i class=\"bi bi-rocket-takeoff\">. In React with react-icons, drop the bi- prefix, write the rest in PascalCase and add Bs in front. The SVG is inlined, so no icon font or Bootstrap CSS has to load.",
+      rows: [
+        ["bi bi-rocket", "BsRocket"],
+        ["bi bi-rocket-takeoff-fill", "BsRocketTakeoffFill"],
+        ["bi bi-house-door", "BsHouseDoor"],
+        ["bi bi-github", "BsGithub"],
+        ["bi bi-x-lg", "BsXLg"],
+        ["bi bi-123", "Bs123"],
+      ],
+    },
+    faq: [
+      { q: "Do I need Bootstrap to use Bootstrap Icons?", a: "No. The icons are plain SVGs under the MIT license. With react-icons you import a component such as BsRocket and it renders an inline SVG; Bootstrap's CSS and JavaScript are not involved." },
+      { q: "Can I use Bootstrap Icons in a commercial project?", a: "Yes. The registry lists Bootstrap Icons as MIT, which allows commercial use. Keep the license notice with your source, as MIT asks." },
+      { q: "How do I change the size or color?", a: "The SVG uses currentColor and 1em, so it follows the text: set color and font-size on the icon or its parent, or pass size and color props to the react-icons component." },
+      { q: "What is the difference between rocket and rocket-takeoff?", a: "rocket is an upright rocket; rocket-takeoff is tilted with exhaust, which reads better for launch or deploy actions. Both have a Fill version for selected or active states." },
+      { q: "Bootstrap Icons or Font Awesome?", a: "Bootstrap Icons is one MIT-licensed set drawn on a 16×16 grid with outline and Fill pairs. Font Awesome 5 and 6 here are the free solid, regular and brand icons, listed as CC BY 4.0, so they need attribution. Pick by look and license." },
+    ],
+  },
+};
+
+export function setExtra(id: string): SetExtra | undefined {
+  return SET_EXTRAS[id];
 }
