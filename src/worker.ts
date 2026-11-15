@@ -1,6 +1,7 @@
 import serverEntry from "@tanstack/react-start/server-entry";
 
 import { iconRedirect } from "./lib/icon-redirect";
+import { NOT_FOUND_ROBOTS, retiredSitemapRedirect, rewriteNotFoundHead } from "./lib/not-found-seo";
 
 /** Registry files for one icon never change between deploys. Per-icon HTML is a 301, so it is not cached here. */
 const EDGE_CACHED = /^\/r\/icons\/[a-z0-9-]+\/[a-zA-Z0-9-]+\.(json|svg)$/;
@@ -12,7 +13,7 @@ export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
     if (request.method === "GET" || request.method === "HEAD") {
-      const redirect = iconRedirect(url.pathname, url.searchParams);
+      const redirect = iconRedirect(url.pathname, url.searchParams) ?? retiredSitemapRedirect(url.pathname);
       if (redirect) {
         const dest = new URL(redirect.location, url.origin);
         return new Response(null, {
@@ -28,7 +29,20 @@ export default {
       request = new Request(url, request) as typeof request;
     }
     const render = () => (serverEntry.fetch as (r: Request, ...rest: unknown[]) => Promise<Response>)(request, env, ctx);
-    if (request.method !== "GET" || url.search || !EDGE_CACHED.test(url.pathname)) return render();
+    const withNotFoundRobots = async () => {
+      const res = await render();
+      if (res.status !== 404) return res;
+      const headers = new Headers(res.headers);
+      headers.set("x-robots-tag", NOT_FOUND_ROBOTS);
+      const type = headers.get("content-type") ?? "";
+      if (!type.includes("text/html")) {
+        return new Response(res.body, { status: 404, statusText: res.statusText, headers });
+      }
+      const html = rewriteNotFoundHead(await res.text());
+      headers.delete("content-length");
+      return new Response(html, { status: 404, statusText: res.statusText, headers });
+    };
+    if (request.method !== "GET" || url.search || !EDGE_CACHED.test(url.pathname)) return withNotFoundRobots();
 
     // Render once per edge location, then serve it like a static file until the next deploy purges or it expires.
     const cache = (caches as unknown as { default: Cache }).default;

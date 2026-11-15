@@ -8,6 +8,7 @@ import { expandQuery, iconKeywords, iconMatchesQuery, POPULAR_SEARCHES, relatedS
 import { iconRedirect } from "../src/lib/icon-redirect.ts";
 import { HUB_DESCRIPTION, HUB_TITLE, licenseLabel, representativeIndexes, setAttribution, setGuide, setImportExample, setPageCopy, titleUnder60, SAMPLE_SIZE } from "../src/lib/icon-set-seo.ts";
 import { kebab, setIdFromSlug, setSlug } from "../src/lib/icon-slugs.ts";
+import { isNotFoundMatches, NOT_FOUND_DESCRIPTION, NOT_FOUND_ROBOTS, NOT_FOUND_TITLE, retiredSitemapRedirect, rewriteNotFoundHead } from "../src/lib/not-found-seo.ts";
 
 const require = createRequire(import.meta.url);
 
@@ -177,4 +178,36 @@ test("set nouns read naturally and never say Icons twice", async () => {
   ];
   for (const [name, want] of cases) assert.equal(setNoun(name), want);
   for (const [name] of cases) assert.doesNotMatch(setPageCopy({ name, count: 1234 }, "MIT license").title, /icons icons/i);
+});
+
+test("retired icon sitemaps redirect to the sitemap index", () => {
+  assert.equal(retiredSitemapRedirect("/sitemap-icons-bootstrap.xml")?.location, "/sitemap.xml");
+  assert.equal(retiredSitemapRedirect("/sitemap-icons-github-octicons.xml")?.location, "/sitemap.xml");
+  assert.equal(retiredSitemapRedirect("/sitemap-icons-lucide.xml/")?.location, "/sitemap.xml");
+  assert.equal(retiredSitemapRedirect("/sitemap-icons-FONT-AWESOME-6.xml")?.location, "/sitemap.xml");
+  assert.equal(retiredSitemapRedirect("/sitemap.xml"), null);
+  assert.equal(retiredSitemapRedirect("/sitemap-pages.xml"), null);
+  assert.equal(retiredSitemapRedirect("/sitemap-icons.xml"), null);
+  assert.equal(retiredSitemapRedirect("/sitemap-icons-bootstrap.xml.bak"), null);
+});
+
+test("not-found matches cover route status and the global flag", () => {
+  assert.equal(isNotFoundMatches([{ status: "success" }]), false);
+  assert.equal(isNotFoundMatches([{ status: "success" }, { status: "notFound" }]), true);
+  assert.equal(isNotFoundMatches([{ status: "success", globalNotFound: true }]), true);
+});
+
+test("HTML 404 head rewrite replaces homepage title, description and robots", () => {
+  const html = `<!doctype html><html><head>
+<title>React components and AI agent UI kit · Cuelark</title>
+<meta name="description" content="Open-source React components for shadcn/ui: an AI agent UI kit."/>
+<meta name="robots" content="index, follow, max-image-preview:large"/>
+</head><body><h1>This page is off the grid</h1></body></html>`;
+  const out = rewriteNotFoundHead(html);
+  assert.match(out, new RegExp(`<title>${NOT_FOUND_TITLE}</title>`));
+  assert.match(out, new RegExp(`content="${NOT_FOUND_DESCRIPTION}"`));
+  assert.match(out, new RegExp(`content="${NOT_FOUND_ROBOTS}"`));
+  assert.equal(out.includes("index, follow, max-image-preview:large"), false);
+  assert.equal(out.includes("React components and AI agent UI kit"), false);
+  assert.equal(out.includes("This page is off the grid"), true);
 });

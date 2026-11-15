@@ -21,6 +21,7 @@ const files: Record<string, string> = {
 
 for (const [path, content] of Object.entries(files)) writeFileSync(join(ROOT, path), content);
 // Per-icon sitemaps are no longer generated. Drop any left behind by an older build so they are not deployed.
+// Requests for those old /sitemap-icons-*.xml URLs 301 to /sitemap.xml in src/worker.ts.
 const publicDir = join(ROOT, "public");
 for (const name of readdirSync(publicDir)) {
   if (name.startsWith("sitemap-icons-") && name.endsWith(".xml")) unlinkSync(join(publicDir, name));

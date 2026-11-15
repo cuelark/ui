@@ -6,6 +6,7 @@ import { SiteFooter } from "@/components/site/footer";
 import { SiteHeader } from "@/components/site/header";
 import { THEME_BOOT_SCRIPT } from "@/components/site/theme-toggle";
 import { SITE } from "@/content/site";
+import { isNotFoundMatches, NOT_FOUND_DESCRIPTION, NOT_FOUND_ROBOTS, NOT_FOUND_TITLE } from "@/lib/not-found-seo";
 import { Button } from "@/registry/cuelark/ui/button";
 import { Empty, EmptyActions, EmptyDescription, EmptyIcon, EmptyTitle } from "@/registry/cuelark/ui/empty";
 import { TooltipProvider } from "@/registry/cuelark/ui/tooltip";
@@ -13,32 +14,36 @@ import "@/styles/globals.css";
 import interFont from "@/fonts/inter/InterVariable-latin.woff2?url";
 
 export const Route = createRootRoute({
-  head: () => ({
-    meta: [
-      { charSet: "utf-8" },
-      { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: SITE.title },
-      { name: "description", content: SITE.description },
-      { name: "theme-color", content: "#fbfbfd", media: "(prefers-color-scheme: light)" },
-      { name: "theme-color", content: "#0f1014", media: "(prefers-color-scheme: dark)" },
-      { name: "color-scheme", content: "light dark" },
-      { name: "robots", content: "index, follow, max-image-preview:large" },
-    ],
-    links: [
-      // Preload the hero font so the headline renders in Inter on first paint instead of after the CSS is parsed.
-      { rel: "preload", href: interFont, as: "font", type: "font/woff2", crossOrigin: "anonymous" },
-      { rel: "icon", href: "/favicon.ico", sizes: "48x48" },
-      { rel: "icon", href: "/favicon.svg", type: "image/svg+xml" },
-      { rel: "apple-touch-icon", href: "/apple-touch-icon.png" },
-      { rel: "alternate", type: "text/plain", href: "/llms.txt", title: "llms.txt" },
-    ],
-    scripts: [
-      { children: THEME_BOOT_SCRIPT },
-      ...(import.meta.env.PROD
-        ? [{ src: "https://analytics.cuelark.com/js/script.js", defer: true, "data-website-id": "672g590k07053p5h" }]
-        : []),
-    ],
-  }),
+  head: ({ matches }) => {
+    const notFound = isNotFoundMatches(matches);
+    return {
+      meta: [
+        { charSet: "utf-8" },
+        { name: "viewport", content: "width=device-width, initial-scale=1" },
+        { title: notFound ? NOT_FOUND_TITLE : SITE.title },
+        { name: "description", content: notFound ? NOT_FOUND_DESCRIPTION : SITE.description },
+        { name: "theme-color", content: "#fbfbfd", media: "(prefers-color-scheme: light)" },
+        { name: "theme-color", content: "#0f1014", media: "(prefers-color-scheme: dark)" },
+        { name: "color-scheme", content: "light dark" },
+        { name: "robots", content: notFound ? NOT_FOUND_ROBOTS : "index, follow, max-image-preview:large" },
+      ],
+      links: [
+        // Preload the hero font so the headline renders in Inter on first paint instead of after the CSS is parsed.
+        { rel: "preload", href: interFont, as: "font", type: "font/woff2", crossOrigin: "anonymous" },
+        { rel: "icon", href: "/favicon.ico", sizes: "48x48" },
+        { rel: "icon", href: "/favicon.svg", type: "image/svg+xml" },
+        { rel: "apple-touch-icon", href: "/apple-touch-icon.png" },
+        { rel: "alternate", type: "text/plain", href: "/llms.txt", title: "llms.txt" },
+      ],
+      scripts: [
+        { children: THEME_BOOT_SCRIPT },
+        ...(import.meta.env.PROD
+          ? [{ src: "https://analytics.cuelark.com/js/script.js", defer: true, "data-website-id": "672g590k07053p5h" }]
+          : []),
+      ],
+    };
+  },
+  headers: ({ matches }) => (isNotFoundMatches(matches) ? { "X-Robots-Tag": NOT_FOUND_ROBOTS } : undefined),
   component: Outlet,
   shellComponent: RootDocument,
   notFoundComponent: NotFound,
